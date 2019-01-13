@@ -31,10 +31,11 @@ namespace fns
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddOptions();
+            services.AddCors(options => {
+                options.AddPolicy("AllowAllDomain", builder=> builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
+            });
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
             Models.DB.FinancialNewsContext.ConnectionString = Configuration.GetConnectionString("FNSNetCoreEF");
         }
@@ -52,11 +53,10 @@ namespace fns
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
+            app.UseCors("AllowAllDomain");
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
