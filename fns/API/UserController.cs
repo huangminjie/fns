@@ -31,12 +31,12 @@ namespace fns.API
         {
             if (req != null)
             {
-                if (!string.IsNullOrEmpty(req.userName) && !string.IsNullOrEmpty(req.passWord))
+                if (!string.IsNullOrEmpty(req.userName) && !string.IsNullOrEmpty(req.password))
                 {
                     db.User.Add(new Models.DB.User()
                     {
                         UserName = req.userName,
-                        Password = MD5Util.Encrypt(req.passWord),
+                        Password = MD5Util.Encrypt(req.password),
                         InsDt = DateTime.Now,
                         UpdatedDt = DateTime.Now,
                         Status = (int)EnumUtil.UserStatus.Normal
@@ -58,7 +58,7 @@ namespace fns.API
                 var user = db.User.FirstOrDefault(u => u.UserName == req.userName);
                 if (user != null)
                 {
-                    if (user.Password == fns.Utils.MD5Util.Encrypt(req.passWord))
+                    if (user.Password == fns.Utils.MD5Util.Encrypt(req.password))
                     {
                         return new Response(true, "登录成功！");
                     }
