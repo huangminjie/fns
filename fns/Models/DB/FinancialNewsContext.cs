@@ -6,6 +6,7 @@ namespace fns.Models.DB
 {
     public partial class FinancialNewsContext : DbContext
     {
+        public static string ConnectionString { get; set; }
         public FinancialNewsContext()
         {
         }
@@ -24,7 +25,7 @@ namespace fns.Models.DB
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=47.99.103.201,1433;Database=FinancialNews;User ID=admin;Password=123456a;");
+                optionsBuilder.UseSqlServer(ConnectionString);
             }
         }
 
@@ -51,10 +52,7 @@ namespace fns.Models.DB
                     .HasColumnName("password")
                     .HasMaxLength(50);
 
-                entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasColumnName("status")
-                    .HasMaxLength(50);
+                entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.Property(e => e.UpdatedDt)
                     .HasColumnName("updatedDt")
@@ -120,10 +118,7 @@ namespace fns.Models.DB
                     .HasColumnName("password")
                     .HasMaxLength(50);
 
-                entity.Property(e => e.Status)
-                    .IsRequired()
-                    .HasColumnName("status")
-                    .HasMaxLength(50);
+                entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.Property(e => e.UpdatedDt)
                     .HasColumnName("updatedDt")

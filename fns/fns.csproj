@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <Folder Include="API\" />
+    <Folder Include="Models\API\Response\" />
     <Folder Include="Views\Admin\" />
     <Folder Include="Views\Banner\" />
     <Folder Include="Views\News\" />

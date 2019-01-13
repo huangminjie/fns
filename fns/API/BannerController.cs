@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-
+using fns.Models.DB;
+using fns.Models.Global;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace fns.API
@@ -11,11 +12,14 @@ namespace fns.API
     [Route("api/[controller]")]
     public class BannerController : Controller
     {
+        private FinancialNewsContext db = new FinancialNewsContext();
         // GET: api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public Response Get()
         {
-            return new string[] { "value1", "value2" };
+            List<Banner> banners = new List<Banner>();
+            banners.AddRange(db.Banner.ToList());
+            return new Response(true, banners);
         }
 
         // GET api/values/5
