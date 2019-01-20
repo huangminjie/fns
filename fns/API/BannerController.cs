@@ -4,7 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using fns.Models.DB;
-using fns.Models.Global;
+using fns.Models.API;
+using fns.Utils;
+using Newtonsoft.Json;
+using fns.Models.API.Request;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace fns.API
@@ -15,11 +18,13 @@ namespace fns.API
         private FinancialNewsContext db = new FinancialNewsContext();
         // GET: api/values
         [HttpGet]
-        public Response Get()
+        public ResponseCommon Get([FromBody]string req)
         {
             List<Banner> banners = new List<Banner>();
             banners.AddRange(db.Banner.ToList());
-            return new Response(true, banners);
+
+            //### TO DO
+            return new ResponseCommon(ResponseCodeEnum.Success.ToEnumValue(), ResponseCodeEnum.Success.ToEnumText(), banners, null);
         }
 
         // GET api/values/5

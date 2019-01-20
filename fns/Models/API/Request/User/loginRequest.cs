@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace fns.Models.API.Request.User
 {
-    public class loginRequest
+    public class loginRequest: RequestBase
     {
         public string userName { get; set; }
         public string password { get; set; }

@@ -1,0 +1,106 @@
+﻿@{ Layout = null; }
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>登录</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        .container > div > div {
+            padding: 10px;
+            margin: auto auto;
+        }
+
+        .colorgraph {
+            height: 5px;
+            border-top: 0;
+            background: #c4e17f;
+            border-radius: 5px;
+            background-image: -webkit-linear-gradient(left, #c4e17f, #c4e17f 12.5%, #f7fdca 12.5%, #f7fdca 25%, #fecf71 25%, #fecf71 37.5%, #f0776c 37.5%, #f0776c 50%, #db9dbe 50%, #db9dbe 62.5%, #c49cde 62.5%, #c49cde 75%, #669ae1 75%, #669ae1 87.5%, #62c2e4 87.5%, #62c2e4);
+            background-image: -moz-linear-gradient(left, #c4e17f, #c4e17f 12.5%, #f7fdca 12.5%, #f7fdca 25%, #fecf71 25%, #fecf71 37.5%, #f0776c 37.5%, #f0776c 50%, #db9dbe 50%, #db9dbe 62.5%, #c49cde 62.5%, #c49cde 75%, #669ae1 75%, #669ae1 87.5%, #62c2e4 87.5%, #62c2e4);
+            background-image: -o-linear-gradient(left, #c4e17f, #c4e17f 12.5%, #f7fdca 12.5%, #f7fdca 25%, #fecf71 25%, #fecf71 37.5%, #f0776c 37.5%, #f0776c 50%, #db9dbe 50%, #db9dbe 62.5%, #c49cde 62.5%, #c49cde 75%, #669ae1 75%, #669ae1 87.5%, #62c2e4 87.5%, #62c2e4);
+            background-image: linear-gradient(to right, #c4e17f, #c4e17f 12.5%, #f7fdca 12.5%, #f7fdca 25%, #fecf71 25%, #fecf71 37.5%, #f0776c 37.5%, #f0776c 50%, #db9dbe 50%, #db9dbe 62.5%, #c49cde 62.5%, #c49cde 75%, #669ae1 75%, #669ae1 87.5%, #62c2e4 87.5%, #62c2e4);
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <div class="row" style="margin-top:20px">
+            <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
+                <form role="form">
+                    <fieldset>
+                        <h2>登录</h2>
+                        <hr class="colorgraph">
+                        <div class="form-group">
+                            <input type="username" name="username" id="txtUserName" class="form-control input-lg" placeholder="用户名">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" name="password" id="txtPassword" class="form-control input-lg" placeholder="密码"  onkeydown='if(event.keyCode==13){$("#btnLogin").click()}'>
+                        </div>
+                        <span class="button-checkbox">
+                            <a href="" class="btn btn-link pull-right">忘记密码?</a>
+                        </span>
+                        <hr class="colorgraph">
+                        <div class="row">
+                            <div class="col-xs-6 col-sm-6 col-md-6">
+                                <input type="button" class="btn btn-lg btn-success btn-block" id="btnLogin" value="登录">
+                            </div>
+                            <div class="col-xs-6 col-sm-6 col-md-6">
+                                @*<a href="" class="btn btn-lg btn-primary btn-block">注册</a>*@
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    <script src="~/js/md5.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        $(function () {
+            $("#btnLogin").bind("click", function () {
+                var username = $.trim($("#txtUserName").val());
+                var password = $.trim($("#txtPassword").val());
+                if (username == "") { alert("用户名不能为空！"); return; }
+                if (password == "") { alert("密码不能为空！"); return; }
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Account/Login",
+                    dataType: "json",
+                    data: {
+                        user: {
+                            UserName: username,
+                            Password: md5(password)
+                        },
+                        returnUrl :"@TempData["returnUrl"]"
+                    }
+                }).done(function (res) {
+                    if (res == null)
+                        alert("登录失败！");
+                    else {
+                        if (res.ok) {
+                            location.href = res.resData;//导向主页或返回页
+                        }
+                        else {
+                            alert(res.message);
+                        }
+                    }
+                });
+
+            })
+
+        })
+
+    </script>
+</body>
+</html>

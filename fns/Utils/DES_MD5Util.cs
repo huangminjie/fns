@@ -7,11 +7,28 @@ using System.Threading.Tasks;
 
 namespace fns.Utils
 {
-    public class MD5Util
+    public class DES_MD5Util
     {
         private static readonly string sKey = "2019FNS";
         /// <summary>
-        /// 加密
+        /// 32位MD5加密
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static string Md5Hash(string input)
+        {
+            MD5CryptoServiceProvider md5Hasher = new MD5CryptoServiceProvider();
+            byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(input));
+            StringBuilder sBuilder = new StringBuilder();
+            for (int i = 0; i < data.Length; i++)
+            {
+                sBuilder.Append(data[i].ToString("x2"));
+            }
+            return sBuilder.ToString();
+        }
+
+        /// <summary>
+        /// DES加密
         /// </summary>
         /// <param name="Text">要加密的文本</param>
         /// <param name="sKey">秘钥</param>
@@ -36,7 +53,7 @@ namespace fns.Utils
         }
 
         /// <summary>
-        /// 解密
+        /// DES解密
         /// </summary>
         /// <param name="Text"></param>
         /// <param name="sKey"></param>
@@ -62,21 +79,5 @@ namespace fns.Utils
             return Encoding.Default.GetString(ms.ToArray());
         }
 
-        /// <summary>
-        /// 32位MD5加密
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        private static string Md5Hash(string input)
-        {
-            MD5CryptoServiceProvider md5Hasher = new MD5CryptoServiceProvider();
-            byte[] data = md5Hasher.ComputeHash(Encoding.Default.GetBytes(input));
-            StringBuilder sBuilder = new StringBuilder();
-            for (int i = 0; i < data.Length; i++)
-            {
-                sBuilder.Append(data[i].ToString("x2"));
-            }
-            return sBuilder.ToString();
-        }
     }
 }
