@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace fns.Models.DB
 {
-    public partial class Banner
+    public partial class Splash
     {
         public int Id { get; set; }
-        public string LinkUrl { get; set; }
         public string PicUrl { get; set; }
-        public int? Type { get; set; }
+        public string RedirectUrl { get; set; }
+        public int? Duration { get; set; }
     }
 }

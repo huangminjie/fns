@@ -11,7 +11,6 @@ namespace fns.Models.Admin.VModels
         public string Title { get; set; }
         public string Content { get; set; }
         public string InsDt { get; set; }
-        public bool DoRef { get; set; }
-        public string NewsUrl { get; set; }
+        public string DoRef { get; set; }
     }
 }

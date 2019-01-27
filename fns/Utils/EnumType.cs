@@ -20,4 +20,9 @@ namespace fns.Utils
         Success = 0,
         Failed = 1
     }
+    public enum UserGenderEnum
+    {
+        Female = 0,
+        Male = 1
+    }
 }

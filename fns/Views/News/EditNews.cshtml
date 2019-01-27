@@ -1,0 +1,103 @@
+﻿@model fns.Models.Admin.VModels.vNews
+
+
+<div class="container">
+    <div class="row">
+        <h2></h2>
+    </div>
+    <form method="post" action="?">
+        <input type="hidden" id="fld-id" name="fld-id" value="">
+        <div class="row">
+
+            <div class="form-group  col-md-12">
+                <label class="control-label col-md-12" for="fld-title">
+                    Title
+                    <input id="fld-title" name="fld-title" class="form-control" placeholder="新闻标题" type="text" value="@(Model.Title)">
+                </label>
+            </div>
+
+
+            <div class="form-group col-md-3">
+                <label class=" control-label col-md-12" for="fld-context">
+                    <div>
+                        <label class="radio-inline" for="fld-context-0">
+                            <input type="radio" name="fld-context" id="fld-context-0" value="内容">
+                            内容
+                        </label>
+                        <label class="radio-inline" for="fld-context-1">
+                            <input type="radio" name="fld-context" id="fld-context-1" value="使用外链">
+                            使用外链
+                        </label>
+                    </div>
+                </label>
+            </div>
+
+
+            <div class="form-group col-md-9"></div>
+
+
+
+            <div class="form-group col-md-12" id="divNewsContent">
+                <div id="editor">
+                    <p>欢迎使用 <b>wangEditor</b> 富文本编辑器</p>
+                </div>
+            </div>
+            <div class="form-group col-md-12" id="divNewsDoRef">
+                <label class="control-label col-md-12" for="fld-title">
+                    新闻外链
+                    <input id="fld-doref" name="fld-title" class="form-control" placeholder="新闻外链" type="text" value="@(Model.DoRef)">
+                </label>
+            </div>
+        </div>
+
+
+        <div class="row">
+
+            <div class="form-group">
+                <div class=" pull-right">
+                    <button id="bt-cancel" class="btn btn-default" type="button" onclick="returnNewsList()">取消</button>
+                    <button id="bt-save" class="btn btn-success" type="button" onclick="submitNews()">提交</button>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+
+<script>
+    var picsList = [];
+    //实例化编辑器
+    var E = window.wangEditor;
+    var editorNews = new E('#divNewsContent #editor');
+    editorNews.customConfig.uploadImgShowBase64 = true;   // 使用 base64 保存图片
+    editorNews.customConfig.linkImgCallback = function (url) {
+        console.log(url); // url 即插入图片的地址
+        picsList.push(url);
+    };
+    editorNews.create();
+    editorNews.txt.html('@Model.Content');
+
+    function returnNewsList() {
+        $("#divEditNews").html("");
+        $("#divNewsList").css("display", "");
+        editorNews.txt.clear();
+    }
+
+    function submitNews() {
+        console.log($("#fld-title").val());
+        console.log($("#fld-doref").val());
+        $.ajax({
+            url: '/News/SaveNews',
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({ "Title": $("#fld-title").val(), "Content": editorNews.txt.html(), "DoRef": $("#fld-doref").val()}),
+            async: true,
+            success: function (data, status) {
+                $("#divEditNews").html(data);
+                $("#divNewsList").css("display", "none");
+            }
+        }); //ajax
+
+    }
+</script>

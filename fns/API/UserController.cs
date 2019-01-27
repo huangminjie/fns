@@ -29,7 +29,8 @@ namespace fns.API
             //register
             //DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { userName = "hahaha", password = "123456", loginUserId = "1", transId = "sdfsd" })); 
             //{d:"8GnI5XCorxsAY4vJqy6JkM6SA5K5ARyCXA8EMksTLEjbdC/x3RyGlRJNd4OJ9Z1OqF7lfqZwLxdqiPQb37l8Q0/HEBWF9igC6U9gQQTPFPM="}
-            return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { userName = "test", password = "123456", loginUserId = "1", transId = "sdfsd" })); 
+            //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { name = "test", password = "123456", gender= "1", avatar = "", loginUserId = "1", transId = "sdfsd" }));
+            return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { name = "test", password = "123456",  loginUserId = "1", transId = "sdfsd" }));
         }
 
         // POST api/values
@@ -43,16 +44,18 @@ namespace fns.API
                     if (!string.IsNullOrEmpty(reqStr))
                     {
                         registRequest rreq = JsonConvert.DeserializeObject<registRequest>(reqStr);
-                        if (!string.IsNullOrEmpty(rreq.userName) && !string.IsNullOrEmpty(rreq.password))
+                        if (!string.IsNullOrEmpty(rreq.name) && !string.IsNullOrEmpty(rreq.password))
                         {
-                            if(db.User.Any(u=>u.UserName == rreq.userName))
+                            if(db.User.Any(u=>u.Name == rreq.name))
                                 return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名已存在！", null, new commParameter(rreq.loginUserId, rreq.transId)));
                             var user = new Models.DB.User()
                             {
-                                UserName = rreq.userName,
+                                Name = rreq.name,
                                 Password = DES_MD5Util.Encrypt(rreq.password),
                                 InsDt = DateTime.Now,
-                                UpdatedDt = DateTime.Now,
+                                Birthday = DateTime.Now,
+                                Gender = rreq.gender,
+                                Avatar = rreq.avatar,
                                 Status = (int)UserStatusEnum.Normal
                             };
                             db.User.Add(user);
@@ -82,7 +85,7 @@ namespace fns.API
                     if (!string.IsNullOrEmpty(reqStr))
                     {
                         loginRequest lreq = JsonConvert.DeserializeObject<loginRequest>(reqStr);
-                        var user = db.User.FirstOrDefault(u => u.UserName == lreq.userName);
+                        var user = db.User.FirstOrDefault(u => u.Name == lreq.name);
                         if (user != null)
                         {
                             if (user.Password == DES_MD5Util.Encrypt(lreq.password))
