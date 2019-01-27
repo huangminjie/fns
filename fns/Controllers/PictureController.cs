@@ -9,16 +9,15 @@ using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace fns.Views
+namespace fns.Controllers
 {
     public class PictureController : Controller
     {
-
         public PictureController(IHostingEnvironment environment)
         {
             this.environment = environment;
         }
-        
+
 
         public class UploadFileData
         {

@@ -1,6 +1,6 @@
 ﻿@model List<fns.Models.Admin.VModels.vNews>
 
- @foreach (var item in Model)
+@foreach (var item in Model)
 {
     <tr>
         <td>@item.Id</td>
@@ -8,8 +8,27 @@
         <td>@item.Content</td>
         <td>@item.InsDt</td>
         <td style="display:flex;">
-            <a href="user.html"><i class="fa fa-pencil fa-fw"></i></a>
+            <a href="javascript:void(0);" onclick="gotoEditNews(@item.Id)"><i class="fa fa-pencil fa-fw"></i></a>
             <a href="#myModal" role="button" data-toggle="modal"><i class="fa fa-remove fa-fw"></i></a>
         </td>
     </tr>
 }
+
+<script>
+        function gotoEditNews(id) {
+            $.ajax({
+                url: '/News/EditNews',
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',//'application/x-www-form-urlencoded;charset=utf-8',//
+                data: { "id": id },
+                async: true,
+                success: function (data, status) {
+                    $("#divEditNews").html(data);
+                    $("#divNewsList").css("display","none");
+                }
+            }); //ajax
+
+
+    }
+
+</script>

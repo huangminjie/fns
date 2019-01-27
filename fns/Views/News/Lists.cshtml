@@ -1,28 +1,30 @@
 ﻿@model fns.Models.Admin.VModels.GridPagination
 
-<div class="btn-toolbar">
-    <button class="btn btn-primary">新建</button>
+<script src="~/lib/wangEditor/wangEditor.js"></script>
+<div id="divNewsList">
+    <div class="btn-toolbar">
+        <button class="btn btn-primary">新建</button>
+    </div>
+    <div class="well">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>序号</th>
+                    <th>标题</th>
+                    <th>内容</th>
+                    <th>创建时间</th>
+                    <th style="width: 36px;"></th>
+                </tr>
+            </thead>
+            <tbody id="tbNews"></tbody>
+        </table>
+    </div>
+    <div>
+        <ul id="paginationNewsList" class="pagination"></ul>
+    </div>
+    <div id="divCurrentPI"></div>
 </div>
-<div class="well">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>标题</th>
-                <th>内容</th>
-                <th>创建时间</th>
-                <th style="width: 36px;"></th>
-            </tr>
-        </thead>
-        <tbody id="tbNews">
-
-        </tbody>
-    </table>
-</div>
-<div>
-    <ul id="paginationNewsList" class="pagination"></ul>
-</div>
-<div id="text"></div>
+<div id="divEditNews"></div>
 
 <br />
 <script>
@@ -32,7 +34,7 @@
             pageSize: @(Model.ps),
             currentPage: 1,
             onPageChange: function (pi, type) {
-                $('#text').html('当前第' + pi + '页');
+                $('#divCurrentPI').html('当前第' + pi + '页');
                 $("#tbNews").load("/News/Items", { "ps": @(Model.ps), "pi": pi}, function () { });
             }
         });

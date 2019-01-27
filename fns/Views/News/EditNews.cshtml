@@ -70,6 +70,7 @@
     //实例化编辑器
     var E = window.wangEditor;
     var editorNews = new E('#divNewsContent #editor');
+    //editorNews.customConfig.uploadImgServer = '/Picture/UploadPicture';  // 上传图片到服务器
     editorNews.customConfig.uploadImgShowBase64 = true;   // 使用 base64 保存图片
     editorNews.customConfig.linkImgCallback = function (url) {
         console.log(url); // url 即插入图片的地址
