@@ -15,6 +15,7 @@
   <ItemGroup>
     <Folder Include="API\" />
     <Folder Include="Models\Admin\Request\" />
+    <Folder Include="UploadPics\" />
     <Folder Include="Views\Admin\" />
     <Folder Include="Views\Banner\" />
   </ItemGroup>

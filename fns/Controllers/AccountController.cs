@@ -24,16 +24,13 @@ namespace fns.Controllers
             {
                 if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
                 {
-                    if (db.Admin.Any(u => u.UserName == userName))
+                    if (db.Admin.Any(u => u.Name == userName))
                         return JsonConvert.SerializeObject(new Response(false, "用户名已存在！", null));
                     var admin = new Models.DB.Admin()
                     {
                         Name = name,
-                        UserName = userName,
-
                         Password = DES_MD5Util.Encrypt(password),
                         InsDt = DateTime.Now,
-                        UpdatedDt = DateTime.Now,
                         Status = (int)AdminStatusEnum.Normal
                     };
                     db.Admin.Add(admin);
@@ -55,7 +52,7 @@ namespace fns.Controllers
             {
                 if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
                 {
-                    var admin = db.Admin.FirstOrDefault(a => a.UserName == userName);
+                    var admin = db.Admin.FirstOrDefault(a => a.Name == userName);
                     //前端传来MD5加密过的密码， 后台把密码解密后MD5加密匹配
                     if (admin != null && DES_MD5Util.Md5Hash(DES_MD5Util.Decrypt(admin.Password)) == password)
                     {
@@ -85,7 +82,7 @@ namespace fns.Controllers
             {
                 return JsonConvert.SerializeObject(new Response(false, "用户名和密码不能为空！", null));
             }
-            var lookupAdmin = db.Admin.FirstOrDefault(u => u.UserName == user.UserName);
+            var lookupAdmin = db.Admin.FirstOrDefault(u => u.Name == user.UserName);
 
             //前端传来MD5加密过的密码， 后台把密码解密后MD5加密匹配
             if (lookupAdmin == null || DES_MD5Util.Md5Hash(DES_MD5Util.Decrypt(lookupAdmin?.Password)) != user.Password)
@@ -94,7 +91,7 @@ namespace fns.Controllers
             }
 
             var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
-            identity.AddClaim(new Claim(ClaimTypes.Name, lookupAdmin.UserName));
+            identity.AddClaim(new Claim(ClaimTypes.Name, lookupAdmin.Name));
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
