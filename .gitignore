@@ -260,3 +260,5 @@ paket-files/
 __pycache__/
 *.pyc
 /fns/Properties/PublishProfiles
+
+*.DS_Store

@@ -22,17 +22,18 @@ namespace fns.Controllers
         public class UploadFileData
         {
             public IFormFile file { get; set; }
+            public string type { get; set; }
         }
         private IHostingEnvironment environment { get; set; }
 
-        [HttpPost("upload-file")]
+        [HttpPost]
         public async Task<IActionResult> UploadPicture(UploadFileData data)
         {
-            var allFiles = Request.Form.Files; // 多文件的话可以直接从 form 拿到完, 或则设置成 List<IFormFile> 就可以了
+            //var allFiles = Request.Form.Files; // 多文件的话可以直接从 form 拿到完, 或则设置成 List<IFormFile> 就可以了
             var root = environment.WebRootPath;
             var extension = Path.GetExtension(data.file.FileName);
             var guid = Guid.NewGuid().ToString();
-            var fullPath = $@"{root}\UploadPics\{guid + extension}";
+            var fullPath = string.Format(@"{0}/upload/{1}/{2}", root, data.type, guid + extension);
             using (FileStream stream = new FileStream(fullPath, FileMode.Create))
             {
                 await data.file.CopyToAsync(stream);

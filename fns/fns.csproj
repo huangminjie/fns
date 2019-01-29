@@ -14,10 +14,11 @@
 
   <ItemGroup>
     <Folder Include="Models\Admin\Request\" />
-    <Folder Include="UploadPics\" />
     <Folder Include="Views\Admin\" />
     <Folder Include="Views\Banner\" />
     <Folder Include="Views\Splash\" />
+    <Folder Include="wwwroot\js\splash\" />
+    <Folder Include="wwwroot\upload\splash\" />
   </ItemGroup>
 
   <ItemGroup>
