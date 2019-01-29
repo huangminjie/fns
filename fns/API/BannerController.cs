@@ -8,6 +8,7 @@ using fns.Models.API;
 using fns.Utils;
 using Newtonsoft.Json;
 using fns.Models.API.Request;
+using fns.Models.API.Response.Banner;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace fns.API
@@ -18,13 +19,35 @@ namespace fns.API
         private FinancialNewsContext db = new FinancialNewsContext();
         // GET: api/values
         [HttpGet]
-        public ResponseCommon Get([FromBody]string req)
+        public string Get([FromQuery]RequestCommon req)
         {
-            List<Banner> banners = new List<Banner>();
-            banners.AddRange(db.Banner.ToList());
+            try
+            {
+                if (req != null && req.d != null)
+                {
+                    var reqStr = DESUtil.DecryptCommonParam(req.d);
+                    if (!string.IsNullOrEmpty(reqStr))
+                    {
+                        RequestBase rreq = JsonConvert.DeserializeObject<RequestBase>(reqStr);
+                        List<bannerResponse> banners = new List<bannerResponse>();
+                        db.Banner.ToList().ForEach(o => {
+                            banners.Add(new bannerResponse()
+                            {
+                                linkUrl = o.LinkUrl,
+                                picUrl = o.PicUrl,
+                                type = o.Type ?? (int)BannerRedirectTypeEnum.In
+                            });
+                        });
+                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { banners = banners })), new commParameter(rreq.loginUserId, rreq.transId)));
 
-            //### TO DO
-            return new ResponseCommon(ResponseCodeEnum.Success.ToEnumValue(), ResponseCodeEnum.Success.ToEnumText(), banners, null);
+                    }
+                }
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", ex.Message, null, new commParameter("", "")));
+            }
         }
 
         // GET api/values/5

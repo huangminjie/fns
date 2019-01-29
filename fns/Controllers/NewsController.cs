@@ -13,37 +13,37 @@ namespace fns.Controllers
     public class NewsController : Controller
     {
         List<vNews> testData = new List<vNews>() {
-                new vNews(){ Id = 1, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 2, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 3, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 4, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 5, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 6, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 7, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 8, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 9, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 10, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 11, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 12, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 12, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 14, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 15, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 16, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 18, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 19, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 20, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 21, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 22, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 23, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 24, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 25, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 26, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 27, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 28, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 29, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 30, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 31, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")},
-                new vNews(){ Id = 32, Title = "靠近建瓯六十万",Content = "看见了课件课件的司法危机", DoRef = "", InsDt = DateTime.Now.ToString("yyyy-MM-dd")}
+                new vNews(){ id = 1, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 2, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 3, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 4, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 5, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 6, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 7, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 8, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 9, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 10, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 11, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 12, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 12, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 14, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 15, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 16, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 18, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 19, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 20, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 21, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 22, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 23, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 24, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 25, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 26, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 27, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 28, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 29, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 30, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 31, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
+                new vNews(){ id = 32, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")}
             };
         private FinancialNewsContext db = new FinancialNewsContext();
         // GET: /<controller>/
@@ -92,7 +92,7 @@ namespace fns.Controllers
             {
                 //var item = testData.FirstOrDefault(n => n.Id == id);
                 var item = db.News.FirstOrDefault();
-                return PartialView(new vNews() { Id = item.Id, Content = item.Content, DoRef = item.DoRef, Title = item.Title, InsDt = item.InsDt?.ToString("yyyy/MM/dd") });
+                return PartialView(new vNews() { id = item.Id, content = item.Content, doRef = item.DoRef, title = item.Title, insDt = item.InsDt?.ToString("yyyy/MM/dd") });
             }
             catch (Exception ex)
             {
@@ -105,7 +105,7 @@ namespace fns.Controllers
         {
             try
             {
-                var s = req.Title;
+                var s = req.title;
                 //var s1 = req.Content;
                 //var cate = new Category() { Name = "asdf" };
                 //db.Category.Add(cate);

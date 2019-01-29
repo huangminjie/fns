@@ -10,5 +10,6 @@ namespace fns.Models.DB
         public string MinVer { get; set; }
         public string UpdateUrl { get; set; }
         public string UpdateDesc { get; set; }
+        public DateTime? InsDt { get; set; }
     }
 }

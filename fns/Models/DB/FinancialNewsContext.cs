@@ -62,15 +62,11 @@ namespace fns.Models.DB
             {
                 entity.Property(e => e.Id).HasColumnName("id");
 
-                entity.Property(e => e.LinkUrl)
-                    .IsRequired()
-                    .HasColumnName("linkUrl")
-                    .HasMaxLength(500);
+                entity.Property(e => e.LinkUrl).HasColumnName("linkUrl");
 
                 entity.Property(e => e.PicUrl)
                     .IsRequired()
-                    .HasColumnName("picUrl")
-                    .HasMaxLength(500);
+                    .HasColumnName("picUrl");
 
                 entity.Property(e => e.Type).HasColumnName("type");
             });
@@ -138,18 +134,18 @@ namespace fns.Models.DB
 
                 entity.Property(e => e.PicUrl)
                     .IsRequired()
-                    .HasColumnName("picUrl")
-                    .HasMaxLength(500);
+                    .HasColumnName("picUrl");
 
-                entity.Property(e => e.RedirectUrl)
-                    .IsRequired()
-                    .HasColumnName("redirectUrl")
-                    .HasMaxLength(500);
+                entity.Property(e => e.RedirectUrl).HasColumnName("redirectUrl");
             });
 
             modelBuilder.Entity<UpdateInfo>(entity =>
             {
                 entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.InsDt)
+                    .HasColumnName("insDT")
+                    .HasColumnType("datetime");
 
                 entity.Property(e => e.MinVer)
                     .IsRequired()
@@ -176,9 +172,7 @@ namespace fns.Models.DB
             {
                 entity.Property(e => e.Id).HasColumnName("id");
 
-                entity.Property(e => e.Avatar)
-                    .HasColumnName("avatar")
-                    .HasMaxLength(150);
+                entity.Property(e => e.Avatar).HasColumnName("avatar");
 
                 entity.Property(e => e.Birthday)
                     .HasColumnName("birthday")

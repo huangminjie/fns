@@ -7,10 +7,10 @@ namespace fns.Models.Admin.VModels
 {
     public class vNews
     {
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public string Content { get; set; }
-        public string InsDt { get; set; }
-        public string DoRef { get; set; }
+        public int id { get; set; }
+        public string title { get; set; }
+        public string content { get; set; }
+        public string insDt { get; set; }
+        public string doRef { get; set; }
     }
 }

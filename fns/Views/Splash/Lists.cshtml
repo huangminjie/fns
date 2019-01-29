@@ -17,12 +17,12 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    <td>@item.Id</td>
+                    <td>@item.id</td>
                     <td>
-                        <img src="@item.PicUrl" style="height:60px;width:60px;"/>
+                        <img src="@item.picUrl" style="height:60px;width:60px;"/>
                     </td>
-                    <td>@item.RedirectUrl</td>
-                    <td>@item.Duration</td>
+                    <td>@item.redirectUrl</td>
+                    <td>@item.duration</td>
                     <td style="display:flex;">
                         <a href="javascript:void(0);" onclick="openModal(@item)"><i class="fa fa-pencil fa-fw"></i></a>
                         <a href="javascript:void(0);"><i class="fa fa-remove fa-fw"></i></a>

@@ -10,10 +10,10 @@ namespace fns.Models.Admin
         public CurrentUser() { }
         public CurrentUser(string username, string password)
         {
-            this.UserName = username;
-            this.Password = password;
+            this.userName = username;
+            this.password = password;
         }
-        public string UserName { get; set; }
-        public string Password { get; set; }
+        public string userName { get; set; }
+        public string password { get; set; }
     }
 }

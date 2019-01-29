@@ -78,14 +78,14 @@ namespace fns.Controllers
         [HttpPost]
         public async Task<string> Login(CurrentUser user, string returnUrl = null)
         {
-            if (user == null || string.IsNullOrEmpty(user.UserName) || string.IsNullOrEmpty(user.Password))
+            if (user == null || string.IsNullOrEmpty(user.userName) || string.IsNullOrEmpty(user.password))
             {
                 return JsonConvert.SerializeObject(new Response(false, "用户名和密码不能为空！", null));
             }
-            var lookupAdmin = db.Admin.FirstOrDefault(u => u.Name == user.UserName);
+            var lookupAdmin = db.Admin.FirstOrDefault(u => u.Name == user.userName);
 
             //前端传来MD5加密过的密码， 后台把密码解密后MD5加密匹配
-            if (lookupAdmin == null || DES_MD5Util.Md5Hash(DES_MD5Util.Decrypt(lookupAdmin?.Password)) != user.Password)
+            if (lookupAdmin == null || DES_MD5Util.Md5Hash(DES_MD5Util.Decrypt(lookupAdmin?.Password)) != user.password)
             {
                 return JsonConvert.SerializeObject(new Response(false, "用户名或密码错误！", null));
             }

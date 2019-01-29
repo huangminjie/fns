@@ -14,11 +14,11 @@ namespace fns.Controllers
         {
             var list = new List<Models.Admin.VModels.vSplash>();
             list.Add(new Models.Admin.VModels.vSplash() 
-            { 
-                Id = "1",
-                RedirectUrl = "www.baidu.com",
-                PicUrl = "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2230167403,4188800858&fm=27&gp=0.jpg",
-                Duration = 3
+            {
+                id = "1",
+                redirectUrl = "www.baidu.com",
+                picUrl = "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2230167403,4188800858&fm=27&gp=0.jpg",
+                duration = 3
             });
             return PartialView(list);
         }

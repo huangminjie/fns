@@ -79,8 +79,8 @@
                     dataType: "json",
                     data: {
                         user: {
-                            UserName: username,
-                            Password: md5(password)
+                            userName: username,
+                            password: md5(password)
                         },
                         returnUrl :"@TempData["returnUrl"]"
                     }

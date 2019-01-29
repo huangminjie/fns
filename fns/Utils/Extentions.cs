@@ -8,6 +8,14 @@ namespace fns.Utils
 {
     public static class Extentions
     {
+        public static string ToDateTime(this DateTime? date)
+        {
+            return date == null ? "" : date?.ToString("yyyy-MM-dd HH:mm");
+        }
+        public static string ToDate(this DateTime? date)
+        {
+            return date == null ? "" : date?.ToString("yyyy-MM-dd");
+        }
         public static string ToEnumValue(this ResponseCodeEnum responseCode)
         {
             switch(responseCode)

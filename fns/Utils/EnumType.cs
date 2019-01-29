@@ -22,7 +22,13 @@ namespace fns.Utils
     }
     public enum UserGenderEnum
     {
-        Female = 0,
-        Male = 1
+        Unknown = 0,
+        Male = 1,
+        Female = 2
+    }
+    public enum BannerRedirectTypeEnum
+    {
+        In = 1, //应用内
+        Out = 2 //应用外
     }
 }

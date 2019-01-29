@@ -3,9 +3,9 @@ namespace fns.Models.Admin.VModels
 {
     public class vSplash
     {
-        public string Id { get; set; }
-        public string PicUrl { get; set; }
-        public string RedirectUrl { get; set; }
-        public int Duration { get; set; }
+        public string id { get; set; }
+        public string picUrl { get; set; }
+        public string redirectUrl { get; set; }
+        public int duration { get; set; }
     }
 }
