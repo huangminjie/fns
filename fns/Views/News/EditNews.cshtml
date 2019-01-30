@@ -63,7 +63,13 @@
         </div>
     </form>
 </div>
-
+<input type="hidden" id="txtNewsDetail" value="@Model.content"/>
+<div class="container" style="margin: 20px auto;font-size: 20px;">
+    <label>预览</label>
+</div>
+<div id="divNewsPreview">
+    
+</div>
 
 <script>
     var picsList = [];
@@ -77,7 +83,9 @@
         picsList.push(url);
     };
     editorNews.create();
-    editorNews.txt.html('@Model.content');
+    $("#divNewsPreview").html($("#txtNewsDetail").val());
+    editorNews.txt.html($("#txtNewsDetail").val());
+    //editorNews.txt.html('@@Model.content');
 
     function returnNewsList() {
         $("#divEditNews").html("");

@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <Folder Include="Models\Admin\Request\" />
+    <Folder Include="wwwroot\uploadnewshtml\" />
     <Folder Include="UploadPics\" />
     <Folder Include="Views\Admin\" />
     <Folder Include="Views\Banner\" />
@@ -24,5 +25,6 @@
     <None Include="wwwroot\lib\jqPaginator-2.0.1\.circleci\config.yml" />
     <None Include="wwwroot\lib\jqPaginator-2.0.1\.github\ISSUE_TEMPLATE.md" />
     <None Include="wwwroot\lib\jqPaginator-2.0.1\.github\lock.yml" />
+    <None Include="wwwroot\uploadnewshtml\News_190130002551835.html" />
   </ItemGroup>
 </Project>

@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using fns.Models.DB;
 using fns.Models.Admin.VModels;
+using fns.Utils;
+using Microsoft.AspNetCore.Hosting;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -12,6 +14,12 @@ namespace fns.Controllers
 {
     public class NewsController : Controller
     {
+        private IHostingEnvironment environment { get; set; }
+        public NewsController(IHostingEnvironment environment)
+        {
+            this.environment = environment;
+        }
+
         List<vNews> testData = new List<vNews>() {
                 new vNews(){ id = 1, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
                 new vNews(){ id = 2, title = "靠近建瓯六十万",content = "看见了课件课件的司法危机", doRef = "", insDt = DateTime.Now.ToString("yyyy-MM-dd")},
@@ -91,7 +99,11 @@ namespace fns.Controllers
             try
             {
                 //var item = testData.FirstOrDefault(n => n.Id == id);
-                var item = db.News.FirstOrDefault();
+                var item = db.News.OrderByDescending(o=>o.Id).FirstOrDefault();
+
+                var root = environment.WebRootPath;
+                var fullPath = $@"{root}\uploadnewshtml\{item.Content}";
+                item.Content=FileUntil.ReadFromHTML(fullPath);
                 return PartialView(new vNews() { id = item.Id, content = item.Content, doRef = item.DoRef, title = item.Title, insDt = item.InsDt?.ToString("yyyy/MM/dd") });
             }
             catch (Exception ex)
@@ -106,22 +118,28 @@ namespace fns.Controllers
             try
             {
                 var s = req.title;
-                //var s1 = req.Content;
-                //var cate = new Category() { Name = "asdf" };
-                //db.Category.Add(cate);
-                //db.News.Add(new News() {
-                //    Auth = "",
-                //    Cid = cate.Id,
-                //    DoRef = req.DoRef,
-                //    Content = req.Content,
-                //    InsDt = DateTime.Now,
-                //    PicUrlList = "",
-                //    Title = req.Title,
-                //    Status = 0
-                //});
-                //db.SaveChanges();
+
+                var root = environment.WebRootPath;
+                var filename = "news_" + System.DateTime.Now.ToString("yyMMddHHmmssfff") + ".html";
+                var fullPath = $@"{root}\uploadnewshtml\{filename}";
+                FileUntil.SaveIntoHTML(fullPath, req.content);
+                
+
+                db.News.Add(new News()
+                {
+                    Auth = "",
+                    Cid = 2, // 娱乐
+                    DoRef = req.doRef,
+                    Content = filename,
+                    InsDt = DateTime.Now,
+                    PicUrlList = "",
+                    Title = req.title,
+                    Status = 0
+                });
+                db.SaveChanges();
+
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
                 throw;
