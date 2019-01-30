@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using fns.Models.Admin;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -22,22 +23,44 @@ namespace fns.Controllers
         public class UploadFileData
         {
             public IFormFile file { get; set; }
+            public string type { get; set; }
         }
         private IHostingEnvironment environment { get; set; }
 
-        [HttpPost("upload-file")]
-        public async Task<IActionResult> UploadPicture(UploadFileData data)
+        [HttpPost]
+        public async Task<IActionResult> UploadPicture()
         {
-            var allFiles = Request.Form.Files; // 多文件的话可以直接从 form 拿到完, 或则设置成 List<IFormFile> 就可以了
-            var root = environment.WebRootPath;
-            var extension = Path.GetExtension(data.file.FileName);
-            var guid = Guid.NewGuid().ToString();
-            var fullPath = $@"{root}\UploadPics\{guid + extension}";
-            using (FileStream stream = new FileStream(fullPath, FileMode.Create))
+            try
             {
-                await data.file.CopyToAsync(stream);
+                var allFiles = Request.Form.Files;
+                var type = Request.Form["type"];
+                var root = environment.WebRootPath;
+                if (allFiles != null)
+                {
+                    var urls = new List<string>();
+                    foreach (var file in allFiles)
+                    {
+                        var extension = Path.GetExtension(file.FileName);
+                        var guid = Guid.NewGuid().ToString();
+                        var fileName = guid + extension;
+                        var filePath = $"{root}/upload/{type}/{fileName}";
+                        using (FileStream stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+                        urls.Add($"/upload/{type}/{fileName}");
+                    }
+                    return Ok(new Response(true, "", urls));
+                }
+                else
+                {
+                    return Ok("无法获取上传文件!");
+                }
             }
-            return Ok();
+            catch (Exception ex)
+            {
+                return Ok(ex.Message);
+            }
         }
     }
 }
