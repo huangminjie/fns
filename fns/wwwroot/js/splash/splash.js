@@ -37,14 +37,15 @@ function imgPreview(fileDom) {
     reader.readAsDataURL(file);
     var formData = new FormData();
     formData.append('file', file);
-    formData.append('type','splash');
+    formData.append('type', 'splash');
+    var serverUrl = 'https://localhost:5001';
     $.ajax({
-        url: 'https://localhost:5001/picture/uploadpicture',
+        url: serverUrl + '/picture/uploadpicture',
         type: 'POST',
-        cache: false, //上传文件不需要缓存
+        cache: false,
         data: formData,
-        processData: false, // 告诉jQuery不要去处理发送的数据
-        contentType: false, // 告诉jQuery不要去设置Content-Type请求头
+        processData: false,
+        contentType: false,
         success: function (data) {
             console.log(data)
         },
