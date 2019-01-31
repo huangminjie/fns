@@ -12,5 +12,6 @@ namespace fns.Models.Admin.VModels
         public string content { get; set; }
         public string insDt { get; set; }
         public string doRef { get; set; }
+        public List<string> PicUrlList { get; set; }
     }
 }

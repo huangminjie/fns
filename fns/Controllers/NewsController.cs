@@ -98,13 +98,10 @@ namespace fns.Controllers
         {
             try
             {
-                //var item = testData.FirstOrDefault(n => n.Id == id);
-                var item = db.News.OrderByDescending(o=>o.Id).FirstOrDefault();
-
-                var root = environment.WebRootPath;
-                var fullPath = $@"{root}\uploadnewshtml\{item.Content}";
-                item.Content=FileUntil.ReadFromHTML(fullPath);
-                return PartialView(new vNews() { id = item.Id, content = item.Content, doRef = item.DoRef, title = item.Title, insDt = item.InsDt?.ToString("yyyy/MM/dd") });
+                var item = db.News.SingleOrDefault(n => n.Id == id);
+                if (item != null)
+                    return PartialView(new vNews() { id = item.Id, content = item.Content, doRef = item.DoRef, title = item.Title, insDt = item.InsDt?.ToString("yyyy/MM/dd") });
+                return PartialView(new vNews());
             }
             catch (Exception ex)
             {
@@ -117,22 +114,15 @@ namespace fns.Controllers
         {
             try
             {
-                var s = req.title;
-
-                var root = environment.WebRootPath;
-                var filename = "news_" + System.DateTime.Now.ToString("yyMMddHHmmssfff") + ".html";
-                var fullPath = $@"{root}\uploadnewshtml\{filename}";
-                FileUntil.SaveIntoHTML(fullPath, req.content);
-                
-
+                var picUrlList = string.Join(",", req.PicUrlList.ToArray());
                 db.News.Add(new News()
                 {
                     Auth = "",
                     Cid = 2, // 娱乐
                     DoRef = req.doRef,
-                    Content = filename,
+                    Content = req.content,
                     InsDt = DateTime.Now,
-                    PicUrlList = "",
+                    PicUrlList = picUrlList,
                     Title = req.title,
                     Status = 0
                 });

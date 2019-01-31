@@ -19,9 +19,9 @@ namespace fns.API
     {
         private FinancialNewsContext db = new FinancialNewsContext();
 
-        //GET api/values
-        [HttpGet]
-        public string Get([FromQuery]RequestCommon req)
+
+        [HttpPost("GetCategories")]
+        public string GetCategories([FromBody]RequestCommon req)
         {
             try
             {

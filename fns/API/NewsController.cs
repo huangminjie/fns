@@ -2,7 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using fns.Models.API;
+using fns.Models.API.Request;
+using fns.Models.API.Request.News;
+using fns.Models.API.Response.News;
+using fns.Models.DB;
+using fns.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using fns.Utils;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -11,36 +19,64 @@ namespace fns.API
     [Route("api/[controller]")]
     public class NewsController : Controller
     {
-        // GET: api/values
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private FinancialNewsContext db = new FinancialNewsContext();
+
+        [HttpPost("GetById")]
+        public string GetById([FromBody]RequestCommon req)
         {
-            return new string[] { "value1", "value2" };
+            try
+            {
+                if (req != null && req.d != null)
+                {
+                    var reqStr = DESUtil.DecryptCommonParam(req.d);
+                    if (!string.IsNullOrEmpty(reqStr))
+                    {
+                        newsRequest rreq = JsonConvert.DeserializeObject<newsRequest>(reqStr);
+                        newsResponse news = new newsResponse();
+                        var model = db.News.SingleOrDefault(n => n.Id == rreq.id);
+                        if (model == null)
+                            return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该文章！", null, new commParameter("", "")));
+                        news = model.ToViewModel();
+                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { news = news })), new commParameter(rreq.loginUserId, rreq.transId)));
+                    }
+                }
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", ex.Message, null, new commParameter("", "")));
+            }
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        // GET api/values
+        [HttpPost("GetList")]
+        public string GetList([FromBody] RequestCommon req)
         {
-            return "value";
+            try
+            {
+                if (req != null && req.d != null)
+                {
+                    var reqStr = DESUtil.DecryptCommonParam(req.d);
+                    if (!string.IsNullOrEmpty(reqStr))
+                    {
+                        newsFilterRequest rreq = JsonConvert.DeserializeObject<newsFilterRequest>(reqStr);
+                        List<newsResponse> newsList = new List<newsResponse>();
+                        var list = db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title)).ToList();
+                        list.ForEach(l=> {
+                            var news = l.ToViewModel();
+                            newsList.Add(news);
+                        });
+                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { newsList = newsList })), new commParameter(rreq.loginUserId, rreq.transId)));
+                    }
+                }
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", ex.Message, null, new commParameter("", "")));
+            }
         }
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-        }
-
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+       
     }
 }

@@ -1,4 +1,4 @@
-var serverUrl = 'https://localhost:5001';
+var serverUrl = 'http://47.99.103.201:8011';
 var picsList = [];
 //实例化编辑器
 var E = window.wangEditor;
@@ -20,12 +20,23 @@ editorNews.customConfig.uploadImgTimeout = 30000;
 editorNews.customConfig.uploadImgHooks = {
     customInsert: function (insertImg, result, editor) {
         result.resData.forEach(url => {
-            insertImg(serverUrl + url);
+            insertImg(url);
+            picsList.push(url);
+            console.log("customInsert");
+            console.log(picsList);
         });
     }
 }
+editorNews.customConfig.linkImgCallback = function (url) {
+    picsList.push(url);// url 即插入图片的地址
+    console.log("linkImgCallback");
+    console.log(picsList);
+}
 editorNews.create();
-editorNews.txt.html('@Model.content');
+editorNews.txt.html($("#txtNewsDetail").val());
+
+//加载预览页面
+$("#divNewsPreview").html($("#txtNewsDetail").val());
 
 function returnNewsList() {
     $("#divEditNews").html("");
@@ -34,13 +45,12 @@ function returnNewsList() {
 }
 
 function submitNews() {
-    console.log($("#fld-title").val());
-    console.log($("#fld-doref").val());
+    console.log(picsList);
     $.ajax({
         url: '/News/SaveNews',
         type: 'POST',
         contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify({ "Title": $("#fld-title").val(), "Content": editorNews.txt.html(), "DoRef": $("#fld-doref").val() }),
+        data: JSON.stringify({ "Title": $("#fld-title").val(), "Content": editorNews.txt.html(), "DoRef": $("#fld-doref").val(), "PicUrlList": picsList }),
         async: true,
         success: function (data, status) {
             $("#divEditNews").html(data);

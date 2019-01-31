@@ -18,6 +18,7 @@
     <Folder Include="Views\Banner\" />
     <Folder Include="Views\Splash\" />
     <Folder Include="wwwroot\js\splash\" />
+    <Folder Include="wwwroot\upload\news\" />
     <Folder Include="wwwroot\upload\splash\" />
   </ItemGroup>
 

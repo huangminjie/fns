@@ -18,9 +18,9 @@ namespace fns.API
     public class SplashController : Controller
     {
         private FinancialNewsContext db = new FinancialNewsContext();
-        // GET: api/values
-        [HttpGet]
-        public string Get([FromQuery]RequestCommon req)
+       
+        [HttpPost("GetSplash")]
+        public string GetSplash([FromBody]RequestCommon req)
         {
             try
             {
@@ -30,17 +30,19 @@ namespace fns.API
                     if (!string.IsNullOrEmpty(reqStr))
                     {
                         RequestBase rreq = JsonConvert.DeserializeObject<RequestBase>(reqStr);
-                        List<splashResponse> splashes = new List<splashResponse>();
-                        db.Splash.ToList().ForEach(o => {
-                            splashes.Add(new splashResponse()
+                        splashResponse splash = new splashResponse();
+                        var model = db.Splash.FirstOrDefault();
+                        if (model != null)
+                        {
+                            splash = new splashResponse()
                             {
-                                id= o.Id,
-                                redirectUrl = o.RedirectUrl,
-                                picUrl = o.PicUrl,
-                                duration = o.Duration ?? 0
-                            });
-                        });
-                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { splashes = splashes })), new commParameter(rreq.loginUserId, rreq.transId)));
+                                id = model.Id,
+                                redirectUrl = model.RedirectUrl,
+                                picUrl = model.PicUrl,
+                                duration = model.Duration ?? 0
+                            };
+                        }
+                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { splash = splash })), new commParameter(rreq.loginUserId, rreq.transId)));
 
                     }
                 }

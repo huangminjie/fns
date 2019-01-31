@@ -18,10 +18,9 @@ namespace fns.API
     public class UpdateInfoController : Controller
     {
         private FinancialNewsContext db = new FinancialNewsContext();
-
-        //GET api/value
-        [HttpGet]
-        public string Get([FromQuery]RequestCommon req)
+        
+        [HttpPost("GetUpdateInfo")]
+        public string GetUpdateInfo([FromBody]RequestCommon req)
         {
             try
             {

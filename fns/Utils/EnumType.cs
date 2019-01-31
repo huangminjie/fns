@@ -31,4 +31,11 @@ namespace fns.Utils
         In = 1, //应用内
         Out = 2 //应用外
     }
+    public enum TagEnum
+    {
+        Top = 1,//置顶 
+        Hot = 2,//热点 
+        Recommend = 3, //推荐 
+        Special = 4//专题
+    }
 }

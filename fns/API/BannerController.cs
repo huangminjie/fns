@@ -18,8 +18,8 @@ namespace fns.API
     {
         private FinancialNewsContext db = new FinancialNewsContext();
         // GET: api/values
-        [HttpGet]
-        public string Get([FromQuery]RequestCommon req)
+        [HttpPost("GetBanners")]
+        public string GetBanners([FromBody]RequestCommon req)
         {
             try
             {
