@@ -28,7 +28,7 @@ namespace fns.Models.DB
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(ConnectionString);
+                optionsBuilder.UseSqlServer(ConnectionString, b => b.UseRowNumberForPaging());//使用老版本SQL分页
             }
         }
 

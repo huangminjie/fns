@@ -10,15 +10,23 @@ using fns.Models.DB;
 using fns.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using fns.Utils;
+using fns.Utils.API;
+using Microsoft.Extensions.Options;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace fns.API
 {
     [Route("api/[controller]")]
-    public class NewsController : Controller
+    public class NewsController : BaseController
     {
+
+        public NewsController(IOptions<Models.Global.AppSettings> settings) : base( settings)
+        {
+
+        }
+
+        public static string ServerPath = "";
         private FinancialNewsContext db = new FinancialNewsContext();
 
         [HttpPost("GetById")]
@@ -36,7 +44,7 @@ namespace fns.API
                         var model = db.News.SingleOrDefault(n => n.Id == rreq.id);
                         if (model == null)
                             return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该文章！", null, new commParameter("", "")));
-                        news = model.ToViewModel();
+                        news = model.ToViewModel(settings.Value.ServerPath);
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { news = news })), new commParameter(rreq.loginUserId, rreq.transId)));
                     }
                 }
@@ -63,7 +71,7 @@ namespace fns.API
                         List<newsResponse> newsList = new List<newsResponse>();
                         var list = db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title)).ToList();
                         list.ForEach(l=> {
-                            var news = l.ToViewModel();
+                            var news = l.ToViewModel(settings.Value.ServerPath);
                             newsList.Add(news);
                         });
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { newsList = newsList })), new commParameter(rreq.loginUserId, rreq.transId)));

@@ -1,44 +1,24 @@
-﻿using fns.Models.API.Response;
-using fns.Models.API.Response.User;
-using fns.Models.API.Response.News;
-using fns.Models.DB;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using fns.Models.Admin.VModels;
+using fns.Models.DB;
 
-namespace fns.Utils
+namespace fns.Utils.Admin
 {
     public static class ModelExtentions
     {
-        private static FinancialNewsContext db = new FinancialNewsContext();
-        public static userResponse ToViewModel(this User model)
+        public static vNews ToViewModel(this News model)
         {
-            userResponse vModel = new userResponse();
-            vModel.id = model.Id;
-            vModel.name = model.Name;
-            vModel.birthday = model.Birthday.ToDate();
-            vModel.gender = model.Gender ?? (int)UserGenderEnum.Unknown;
-            vModel.avatar = model.Avatar;
-            vModel.status = model.Status;
-            return vModel;
-        }
-        public static newsResponse ToViewModel(this News model)
-        {
-            newsResponse vModel = new newsResponse();
+            vNews vModel = new vNews();
             vModel.id = model.Id;
             vModel.title = model.Title;
             vModel.content = model.Content;
             vModel.doRef = model.DoRef;
             vModel.cid = model.Cid;
-            var categoryName = "";
-            if (model.C == null)
-            {
-                categoryName = db.Category.SingleOrDefault(o => o.Id == model.Cid)?.Name;
-            }
-            vModel.cName = model.C == null? "" : model.C.Name;
             vModel.auth = model.Auth;
-            vModel.picUrlList = model.PicUrlList;
+            vModel.picUrlList = model.PicUrlList.Split(',').ToList();
             vModel.tag = model.Tag ?? 0;
             vModel.upCount = model.UpCount ?? 0;
             vModel.viewCount = model.ViewCount ?? 0;

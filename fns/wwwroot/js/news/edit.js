@@ -1,4 +1,4 @@
-var serverUrl = 'http://47.99.103.201:8011';
+var serverUrl = $("#txtServerPath").val();//'http://47.99.103.201:8011';
 var picsList = [];
 //实例化编辑器
 var E = window.wangEditor;
@@ -50,7 +50,7 @@ function submitNews() {
         url: '/News/SaveNews',
         type: 'POST',
         contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify({ "Title": $("#fld-title").val(), "Content": editorNews.txt.html(), "DoRef": $("#fld-doref").val(), "PicUrlList": picsList }),
+        data: JSON.stringify({ "title": $("#fld-title").val(), "content": editorNews.txt.html(), "doRef": $("#fld-doref").val(), "picUrlList": picsList }),
         async: true,
         success: function (data, status) {
             $("#divEditNews").html(data);

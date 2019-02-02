@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -39,10 +40,7 @@ namespace fns
             });
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
             Models.DB.FinancialNewsContext.ConnectionString = Configuration.GetConnectionString("FNSNetCoreEF");
-
-            //services.AddAuthorization();//添加授权认证
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(options => options.LoginPath = new PathString("/Account/Login"));
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => options.LoginPath = new PathString("/Account/Login"));
 
         }
 

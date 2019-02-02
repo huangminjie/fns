@@ -9,6 +9,7 @@ using fns.Models.API.Request.User;
 using System.Security.Cryptography;
 using fns.Models.API;
 using fns.Utils;
+using fns.Utils.API;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net;
@@ -60,15 +61,15 @@ namespace fns.API
                                 Name = rreq.name,
                                 Password = DES_MD5Util.Encrypt(rreq.password),
                                 InsDt = DateTime.Now,
-                                Gender = rreq.gender,
-                                Avatar = rreq.avatar,
+                                Gender = 0,//rreq.gender,
+                                //Avatar = rreq.avatar,
                                 Status = (int)UserStatusEnum.Normal
                             };
 
-                            DateTime birthday = DateTime.MinValue;
-                            var isDate = DateTime.TryParse(rreq.birthday, out birthday);
-                            if (isDate && birthday != DateTime.MinValue)
-                                user.Birthday = birthday;
+                            //DateTime birthday = DateTime.MinValue;
+                            //var isDate = DateTime.TryParse(rreq.birthday, out birthday);
+                            //if (isDate && birthday != DateTime.MinValue)
+                            //    user.Birthday = birthday;
 
                             db.User.Add(user);
                             await db.SaveChangesAsync();

@@ -7,6 +7,6 @@ namespace fns.Models.Global
 {
     public class AppSettings
     {
-        public string MD5_Key { get; set; }
+        public string ServerPath { get; set; }
     }
 }

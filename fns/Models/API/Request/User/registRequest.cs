@@ -9,8 +9,8 @@ namespace fns.Models.API.Request.User
     {
         public string name { get; set; }
         public string password { get; set; }
-        public int gender { get; set; }
-        public string avatar { get; set; }
-        public string birthday { get; set; }
+        //public int gender { get; set; }
+        //public string avatar { get; set; }
+        //public string birthday { get; set; }
     }                 
 }

@@ -9,7 +9,8 @@ namespace fns.Models.API.Response.News
     {
         public int id { get; set; }
         public string title { get; set; }
-        public string content { get; set; }
+        //public string content { get; set; }
+        public string contentRef { get; set; }
         public string doRef { get; set; }
         public int cid { get; set; }
         public string cName { get; set; }
