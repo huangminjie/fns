@@ -9,5 +9,8 @@ namespace fns.Models.API.Request.News
     {
         public string title { get; set; }
         public string auth { get; set; }
+        public int cid { get; set; }
+        public int pi { get; set; }
+        public int ps { get; set; }
     }
 }

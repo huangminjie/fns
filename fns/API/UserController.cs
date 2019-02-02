@@ -27,7 +27,7 @@ namespace fns.API
         [HttpGet("{id}")]
         public string Get(int id)
         {
-            return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "1", transId = "sdfsd" , title = "", auth=""}));
+            return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "1", transId = "sdfsd", title = "", auth = "", cid = 2, pi = 2, ps = 3 }));
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "1", transId = "sdfsd", id = 2 }));
             //return DESUtil.DecryptCommonParam("Kinv8nJpClfbtu2i6lajWjv7OzcJ1k0mvbR4qRli4jsw1uWvG6hZBTU5BTQ+x/cXWBXlSebQGj/i6+JdSGuqV6yor8elj9hOT4OvOnIGbI78qho+i97xguh4zZEEusGq4viCXED5rLF/cDAl1BzRZGfWXpVtLFoZxpp4tAcjp97U5CXWSaEPkraMroflYSc3mktSdQWkTMtGBhGwML1wE7QjoHd+rN7rTm2RGgTL9n0Ot1UcDncK0UbsdVVyxCxkx1Io7Ojk1lKl9GVrOcg5wNbR2fYahtfhQusKGdC+QddKW9rUjzU/12oobUYRlee1cjMu3u7bogrAZ9nnlENUYzFzAz6iUWMM");
             //register
@@ -44,7 +44,8 @@ namespace fns.API
         [HttpPost]
         public async Task<string> PostAsync([FromBody]RequestCommon req)
         {
-            try {
+            try
+            {
                 if (req != null && req.d != null)
                 {
                     var reqStr = DESUtil.DecryptCommonParam(req.d);
@@ -53,9 +54,9 @@ namespace fns.API
                         registRequest rreq = JsonConvert.DeserializeObject<registRequest>(reqStr);
                         if (!string.IsNullOrEmpty(rreq.name) && !string.IsNullOrEmpty(rreq.password))
                         {
-                            if(db.User.Any(u=>u.Name == rreq.name))
+                            if (db.User.Any(u => u.Name == rreq.name))
                                 return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名已存在！", null, new commParameter(rreq.loginUserId, rreq.transId)));
-                            
+
                             var user = new Models.DB.User()
                             {
                                 Name = rreq.name,
@@ -75,7 +76,7 @@ namespace fns.API
                             await db.SaveChangesAsync();
                             return JsonConvert.SerializeObject(new ResponseCommon("0000", "注册成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel() })), new commParameter(rreq.loginUserId, rreq.transId)));
                         }
-                        return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名或密码不能为空！", null, new commParameter(rreq.loginUserId, rreq.transId)));                        
+                        return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名或密码不能为空！", null, new commParameter(rreq.loginUserId, rreq.transId)));
                     }
                 }
                 return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));

@@ -21,7 +21,7 @@ namespace fns.API
     public class NewsController : BaseController
     {
 
-        public NewsController(IOptions<Models.Global.AppSettings> settings) : base( settings)
+        public NewsController(IOptions<Models.Global.AppSettings> settings) : base(settings)
         {
 
         }
@@ -69,8 +69,9 @@ namespace fns.API
                     {
                         newsFilterRequest rreq = JsonConvert.DeserializeObject<newsFilterRequest>(reqStr);
                         List<newsResponse> newsList = new List<newsResponse>();
-                        var list = db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title)).ToList();
-                        list.ForEach(l=> {
+                        var list = db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title) && n.Cid == rreq.cid).Skip((rreq.pi - 1) * rreq.ps).Take(rreq.ps).ToList();
+                        list.ForEach(l =>
+                        {
                             var news = l.ToViewModel(settings.Value.ServerPath);
                             newsList.Add(news);
                         });
@@ -85,6 +86,6 @@ namespace fns.API
             }
         }
 
-       
+
     }
 }
