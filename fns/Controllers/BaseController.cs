@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using fns.Models.DB;
 using fns.Models.Global;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,14 @@ namespace fns.Controllers
 {
     public class BaseController : Controller
     {
+        protected FinancialNewsContext db = new FinancialNewsContext();
         protected readonly IOptions<AppSettings> settings;
         protected readonly IHostingEnvironment environment;
-        public BaseController(IHostingEnvironment environment, IOptions<AppSettings> settings) {
+        public BaseController(IHostingEnvironment environment, IOptions<AppSettings> settings)
+        {
             this.environment = environment;
             this.settings = settings;
         }
+
     }
 }

@@ -7,7 +7,7 @@ namespace fns.Models.Admin
 {
     public class Response
     {
-        public Response(bool ok, string message, dynamic resData)
+        public Response(bool ok, string message = "", dynamic resData = null)
         {
             this.ok = ok;
             this.message = message;

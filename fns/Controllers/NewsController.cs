@@ -12,18 +12,19 @@ using Microsoft.Extensions.Options;
 using fns.Models.Global;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using fns.Models.Admin;
+using Microsoft.EntityFrameworkCore;
+using fns.Models.Admin.Request;
 
 namespace fns.Controllers
 {
     [Authorize]
     public class NewsController : BaseController
     {
-        public NewsController(IHostingEnvironment environment, IOptions<AppSettings> settings):base(environment, settings)
+        public NewsController(IHostingEnvironment environment, IOptions<AppSettings> settings) : base(environment, settings)
         {
 
         }
-                
-        private FinancialNewsContext db = new FinancialNewsContext();
         // GET: /<controller>/
         public IActionResult Index()
         {
@@ -56,7 +57,7 @@ namespace fns.Controllers
                 var ps = 10;
                 var total = db.News.Count();
                 var loadData = db.News.Skip((pi - 1) * ps).Take(ps).ToList();
-                return PartialView(new GridPagination() { ps = ps, total = total});
+                return PartialView(new GridPagination() { ps = ps, total = total });
             }
             catch (Exception ex)
             {
@@ -71,7 +72,7 @@ namespace fns.Controllers
             try
             {
                 var list = db.News.Skip((pi - 1) * ps).Take(ps).ToList();
-                var vList = list.Select(news=>news.ToViewModel()).ToList();
+                var vList = list.Select(news => news.ToViewModel()).ToList();
                 return PartialView(vList);
             }
             catch (Exception ex)
@@ -80,7 +81,7 @@ namespace fns.Controllers
             }
             return PartialView(null);
         }
-        
+
         //[CacheControl(HttpCacheability.NoCache), HttpGet]
         [HttpGet]
         public IActionResult EditNews(int id)
@@ -125,6 +126,71 @@ namespace fns.Controllers
                 throw;
             }
             return "ok";
+        }
+
+        public IActionResult CategoryLists()
+        {
+            return PartialView();
+        }
+        [HttpGet]
+        public async Task<Response> GetCategoryList()
+        {
+            try
+            {
+                var list = new List<Models.Admin.VModels.vCategory>();
+                await db.Category.ForEachAsync(o =>
+                {
+                    list.Add(new vCategory()
+                    {
+                        id = o.Id.ToString(),
+                        name = o.Name
+                    });
+                });
+                return new Response(true, "", list);
+            }
+            catch (Exception ex)
+            {
+                return new Response(false, ex.Message);
+            }
+        }
+        [HttpPost]
+        public async Task<Response> SaveCategory([FromBody]vCategory req)
+        {
+            try
+            {
+                db.Category.Add(new Category()
+                {
+                    Name = req.name
+                });
+                await db.SaveChangesAsync();
+                return new Response(true);
+            }
+            catch (Exception ex)
+            {
+                return new Response(false, ex.Message);
+            }
+        }
+        [HttpPost]
+        public async Task<Response> DeleteCategory([FromBody]DeleteRequest req)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(req.id))
+                {
+                    var category = await db.Category.SingleOrDefaultAsync(o => o.Id == Convert.ToInt32(req.id));
+                    db.Category.Remove(category);
+                    await db.SaveChangesAsync();
+                    return new Response(true);
+                }
+                else
+                {
+                    return new Response(false, "请选择要删除的项");
+                }
+            }
+            catch (Exception ex)
+            {
+                return new Response(false, ex.Message);
+            }
         }
     }
 }
