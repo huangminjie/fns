@@ -68,12 +68,27 @@ namespace fns.API
                     if (!string.IsNullOrEmpty(reqStr))
                     {
                         newsFilterRequest rreq = JsonConvert.DeserializeObject<newsFilterRequest>(reqStr);
+                        DateTime dt = DateTime.Now;
+                        List<News> list = new List<News>();
                         List<newsResponse> newsList = new List<newsResponse>();
-                        var list = db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title) && n.Cid == rreq.cid).Skip((rreq.pi - 1) * rreq.ps).Take(rreq.ps).ToList();
+                        News news = db.News.SingleOrDefault(o=>o.Id == (rreq.id ?? 0));
+                        if (news != null)
+                        {
+                            dt = news.InsDt ?? DateTime.Now;
+                        }
+                        //上拉获取历史数据
+                        if (rreq.op == 0)
+                        {
+                            list = db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title) && n.Cid == rreq.cid && n.InsDt < dt).OrderByDescending(o => o.InsDt).Take(rreq.ps).ToList();
+                        }
+                        //下拉获取最新数据
+                        else
+                        {
+                            list = db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title) && n.Cid == rreq.cid && n.InsDt > dt).OrderBy(o => o.InsDt).Take(rreq.ps).OrderByDescending(o => o.InsDt).ToList();
+                        }
                         list.ForEach(l =>
                         {
-                            var news = l.ToViewModel(settings.Value.ServerPath);
-                            newsList.Add(news);
+                            newsList.Add(l.ToViewModel(settings.Value.ServerPath));
                         });
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { newsList = newsList })), new commParameter(rreq.loginUserId, rreq.transId)));
                     }
