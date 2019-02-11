@@ -1,15 +1,15 @@
-﻿var splashList = [];
+﻿var bannerList = [];
 $(function () {
     search();
 });
 function search() {
     $.ajax({
-        url: '/Splash/GetList',
+        url: '/Banner/GetList',
         type: 'GET',
         success: function (data, status) {
             if (data.ok) {
                 $("tbody").empty();
-                splashList = data.resData;
+                bannerList = data.resData;
                 data.resData.forEach((item) => {
                     var tr = `
                     <tr>
@@ -17,8 +17,8 @@ function search() {
                         <td>
                             <img src="${item.picUrl}" style="height: 60px;width: 60px;" />
                         </td>
-                        <td>${item.redirectUrl}</td>
-                        <td>${item.duration}</td>
+                        <td>${item.linkUrl}</td>
+                        <td>${item.type == 1 ?"应用内":"应用外"}</td>
                         <td style="display: flex;">
                             <a href="javascript:void(0);" onclick="openModal(${item.id})"><i class="fa fa-pencil fa-fw"></i></a>
                             <a href="javascript:void(0);" onclick="remove(${item.id})"><i class="fa fa-remove fa-fw"></i></a>
@@ -36,18 +36,18 @@ function search() {
 }
 function openModal(id) {
     if (id) {
-        var data = splashList.find(o => o.id == id);
+        var data = bannerList.find(o => o.id == id);
         $("#modalTitle").html("修改");
         $("#id").val(data.id);
-        $("#redirectUrl").val(data.redirectUrl);
-        $("#duration").val(data.duration);
+        $("#linkUrl").val(data.linkUrl);
+        $("#type").val(data.type);
         $("#picUrl").val(data.picUrl);
         $("#preview").prop("src", data.picUrl);
     }
     else {
         $("#id").val('');
-        $("#redirectUrl").val('');
-        $("#duration").val('');
+        $("#linkUrl").val('');
+        $("#type").val('1');
         $("#picUrl").val('');
         $("#preview").prop("src", null);
         $("#modalTitle").html("新增");
@@ -56,8 +56,8 @@ function openModal(id) {
 }
 function save() {
     var id = $("#id").val();
-    var redirectUrl = $("#redirectUrl").val();
-    var duration = $("#duration").val();
+    var linkUrl = $("#linkUrl").val();
+    var type = $("#type").val();
     var picUrl = $("#picUrl").val();
     if (picUrl === '') {
         alert("请选择图片!");
@@ -65,12 +65,12 @@ function save() {
     }
     var data = {
         id: id,
-        redirectUrl: redirectUrl,
-        duration: duration,
+        linkUrl: linkUrl,
+        type: type,
         picUrl: picUrl
     };
     $.ajax({
-        url: '/Splash/Save',
+        url: '/Banner/Save',
         type: 'POST',
         dataType: 'json',
         contentType: 'application/json; charset=utf-8',
@@ -110,7 +110,7 @@ function imgPreview(fileDom) {
     reader.readAsDataURL(file);
     var formData = new FormData();
     formData.append('file', file);
-    formData.append('type', 'splash');
+    formData.append('type', 'banner');
     $.ajax({
         url: '/Picture/UploadPicture',
         type: 'POST',
@@ -133,7 +133,7 @@ function remove(id) {
     var r = confirm("确认删除?");
     if (r == true) {
         $.ajax({
-            url: '/Splash/Delete',
+            url: '/Banner/Delete',
             type: 'POST',
             dataType: 'json',
             contentType: 'application/json; charset=utf-8',
@@ -149,4 +149,5 @@ function remove(id) {
         })
     }
 }
+
 

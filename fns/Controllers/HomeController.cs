@@ -6,11 +6,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using fns.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
+using fns.Models.Global;
 
 namespace fns.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
+        public HomeController(IHostingEnvironment environment, IOptions<AppSettings> settings) : base(environment, settings)
+        {
+
+        }
         [Authorize]
         public IActionResult Index()
         {

@@ -20,6 +20,10 @@
     <Folder Include="wwwroot\js\splash\" />
     <Folder Include="wwwroot\upload\news\" />
     <Folder Include="wwwroot\upload\splash\" />
+    <Folder Include="wwwroot\js\banner\" />
+    <Folder Include="wwwroot\css\banner\" />
+    <Folder Include="Views\User\" />
+    <Folder Include="wwwroot\js\user\" />
   </ItemGroup>
 
   <ItemGroup>

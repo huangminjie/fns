@@ -10,13 +10,19 @@ using fns.Utils;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
+using fns.Models.Global;
 
 namespace fns.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
-        private FinancialNewsContext db = new FinancialNewsContext();
-        
+        public AccountController(IHostingEnvironment environment, IOptions<AppSettings> settings) : base(environment, settings)
+        {
+
+        }
+
 
         public string Register(string name, string userName, string password)
         {
