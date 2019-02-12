@@ -1,15 +1,15 @@
 ﻿$(function () {
-    search(1);
+    search(0);
 });
-function search(pi) {
+function search(index) {
     var data = {
-        pi: pi,
+        pi: index === 0?1:index,
         ps: 10
     }
     $.ajax({
         url: '/User/GetList',
         type: 'GET',
-        data: JSON.stringify(data),
+        data: data,
         success: function (data, status) {
             if (data.ok) {
                 $("tbody").empty();
@@ -32,22 +32,49 @@ function search(pi) {
                     `;
                     $("tbody").append(tr);
                 });
-                $('#paginationUserList.pagination').jqPaginator('option', {
-                    totalCounts: data.resData.total,
-                    pageSize: data.resData.ps,
-                    currentPage: data.resData.pi,
-                    onPageChange: function (pi, type) {
-
+                if(data.resData.total > 0){
+                    if(index === 0){
+                        $('#paginationUserList.pagination').jqPaginator({
+                            totalCounts: data.resData.total,
+                            pageSize: data.resData.ps,
+                            currentPage: data.resData.pi,
+                            onPageChange: function (num, type) {
+                                search(num);
+                            }
+                        });
                     }
-                });
-                //$('#pagination').jqPaginator('option', {
-                //    currentPage: pi,
-                //    totalCounts: data.resData.total
-                //});
+                    else{
+                        $('#paginationUserList.pagination').jqPaginator('option', {
+                            currentPage: index
+                        });
+                    }
+                }
             }
             else {
                 alert(data.message);
             }
         }
     })
+}
+function remove(id){
+    var r = confirm("确认删除?");
+    if (r == true) {
+        $.ajax({
+            url: '/User/Delete',
+            type: 'POST',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                id:id
+            }),
+            success: function (data, status) {
+                if (data.ok) {
+                    search(1);
+                }
+                else {
+                    alert(data.message);
+                }
+            }
+        })
+    }
 }
