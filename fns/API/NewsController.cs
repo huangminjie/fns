@@ -76,6 +76,8 @@ namespace fns.API
                         {
                             dt = news.InsDt ?? DateTime.Now;
                         }
+                        rreq.title = string.IsNullOrEmpty(rreq.title) ? "" : rreq.title;
+                        rreq.auth = string.IsNullOrEmpty(rreq.auth) ? "" : rreq.auth;
                         //上拉获取历史数据
                         if (rreq.op == 0)
                         {
