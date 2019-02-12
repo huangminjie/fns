@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 using fns.Models.Admin.VModels;
 using fns.Utils;
+using fns.Models.Admin.Request;
 
 namespace fns.Controllers
 {
@@ -56,6 +57,29 @@ namespace fns.Controllers
                 });
             }
             catch (System.Exception ex)
+            {
+                return new Response(false, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<Response> Delete([FromBody]DeleteRequest req)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(req.id))
+                {
+                    var user = await db.User.SingleOrDefaultAsync(o => o.Id == Convert.ToInt32(req.id));
+                    db.User.Remove(user);
+                    await db.SaveChangesAsync();
+                    return new Response(true);
+                }
+                else
+                {
+                    return new Response(false, "请选择要删除的项");
+                }
+            }
+            catch (Exception ex)
             {
                 return new Response(false, ex.Message);
             }
