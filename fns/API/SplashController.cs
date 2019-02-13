@@ -9,16 +9,22 @@ using fns.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using fns.Models.API.Response.Splash;
+using Microsoft.AspNetCore.Hosting;
+using fns.Models.Global;
+using Microsoft.Extensions.Options;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace fns.API
 {
     [Route("api/[controller]")]
-    public class SplashController : Controller
+    public class SplashController : BaseController
     {
-        private FinancialNewsContext db = new FinancialNewsContext();
-       
+        public SplashController(IHostingEnvironment environment, IOptions<AppSettings> settings) : base(environment, settings)
+        {
+
+        }
+
         [HttpPost("GetSplash")]
         public string GetSplash([FromBody]RequestCommon req)
         {
@@ -38,7 +44,7 @@ namespace fns.API
                             {
                                 id = model.Id,
                                 redirectUrl = model.RedirectUrl,
-                                picUrl = model.PicUrl,
+                                picUrl = settings.Value.ServerPath + model.PicUrl,
                                 duration = model.Duration ?? 0
                             };
                         }

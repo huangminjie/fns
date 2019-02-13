@@ -18,7 +18,7 @@ namespace fns.Utils.Admin
             vModel.doRef = model.DoRef;
             vModel.cid = model.Cid;
             vModel.auth = model.Auth;
-            vModel.picUrlList = model.PicUrlList.Split(',').ToList();
+            vModel.picUrlList = model.PicUrlList.Split("_,_").ToList();
             vModel.tag = model.Tag ?? 0;
             vModel.upCount = model.UpCount ?? 0;
             vModel.viewCount = model.ViewCount ?? 0;

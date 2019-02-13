@@ -17,16 +17,11 @@ using System.Threading.Tasks;
 namespace fns.API
 {
     [Route("api/[controller]")]
-    public class PictureController : Controller
+    public class PictureController : BaseController
     {
-
-        protected FinancialNewsContext db = new FinancialNewsContext();
-        protected readonly IOptions<AppSettings> settings;
-        protected readonly IHostingEnvironment environment;
-        public PictureController(IHostingEnvironment environment, IOptions<AppSettings> settings)
+        public PictureController(IHostingEnvironment environment, IOptions<AppSettings> settings) : base(environment, settings)
         {
-            this.environment = environment;
-            this.settings = settings;
+
         }
 
         [HttpPost("UploadPicture")]

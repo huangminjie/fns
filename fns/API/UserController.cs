@@ -13,21 +13,27 @@ using fns.Utils.API;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Net;
+using Microsoft.AspNetCore.Hosting;
+using fns.Models.Global;
+using Microsoft.Extensions.Options;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace fns.API
 {
     [Route("api/[controller]")]
-    public class UserController : Controller
+    public class UserController : BaseController
     {
-        private FinancialNewsContext db = new FinancialNewsContext();
+        public UserController(IHostingEnvironment environment, IOptions<AppSettings> settings) : base(environment, settings)
+        {
+
+        }
 
         //GET api/values/5
         [HttpGet("{id}")]
         public string Get(int id)
         {
-            return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "1", transId = "sdfsd", cid = 1, ps = 15, op = 0, id = 0 }));
+            return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "1", transId = "sdfsd", cid = 2, ps = 15, op = 0, id = 0 }));
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "1", transId = "sdfsd", id = 2 }));
             //return DESUtil.DecryptCommonParam("Kinv8nJpClfbtu2i6lajWjv7OzcJ1k0mvbR4qRli4jsw1uWvG6hZBTU5BTQ+x/cXWBXlSebQGj/i6+JdSGuqV6yor8elj9hOT4OvOnIGbI78qho+i97xguh4zZEEusGq4viCXED5rLF/cDAl1BzRZGfWXpVtLFoZxpp4tAcjp97U5CXWSaEPkraMroflYSc3mktSdQWkTMtGBhGwML1wE7QjoHd+rN7rTm2RGgTL9n0Ot1UcDncK0UbsdVVyxCxkx1Io7Ojk1lKl9GVrOcg5wNbR2fYahtfhQusKGdC+QddKW9rUjzU/12oobUYRlee1cjMu3u7bogrAZ9nnlENUYzFzAz6iUWMM");
             //register
@@ -74,7 +80,7 @@ namespace fns.API
 
                             db.User.Add(user);
                             await db.SaveChangesAsync();
-                            return JsonConvert.SerializeObject(new ResponseCommon("0000", "注册成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel() })), new commParameter(rreq.loginUserId, rreq.transId)));
+                            return JsonConvert.SerializeObject(new ResponseCommon("0000", "注册成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel(settings.Value.ServerPath) })), new commParameter(rreq.loginUserId, rreq.transId)));
                         }
                         return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名或密码不能为空！", null, new commParameter(rreq.loginUserId, rreq.transId)));
                     }
@@ -104,7 +110,7 @@ namespace fns.API
                         {
                             if (user.Password == DES_MD5Util.Encrypt(lreq.password))
                             {
-                                return JsonConvert.SerializeObject(new ResponseCommon("0000", "登录成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel() })), new commParameter(lreq.loginUserId, lreq.transId)));
+                                return JsonConvert.SerializeObject(new ResponseCommon("0000", "登录成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel(settings.Value.ServerPath) })), new commParameter(lreq.loginUserId, lreq.transId)));
                             }
                             return JsonConvert.SerializeObject(new ResponseCommon("0002", "该用户名或密码不正确！", null, new commParameter(lreq.loginUserId, lreq.transId)));
                         }
@@ -132,16 +138,16 @@ namespace fns.API
                     if (!string.IsNullOrEmpty(reqStr))
                     {
                         userRequest ureq = JsonConvert.DeserializeObject<userRequest>(reqStr);
-                        if (!string.IsNullOrEmpty(ureq.name))
+                        if (ureq.id != 0)
                         {
                             var user = db.User.SingleOrDefault(u => u.Id == ureq.id);
                             if (user == null)
                                 return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该用户！", null, new commParameter(ureq.loginUserId, ureq.transId)));
 
-                            if (db.User.Any(u => u.Name == ureq.name && u.Id != ureq.id))
-                                return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名已存在！", null, new commParameter(ureq.loginUserId, ureq.transId)));
+                            //if (db.User.Any(u => u.Name == ureq.name && u.Id != ureq.id))
+                            //    return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名已存在！", null, new commParameter(ureq.loginUserId, ureq.transId)));
 
-                            user.Name = ureq.name;
+                            //user.Name = ureq.name;
                             DateTime birthday = DateTime.MinValue;
                             var isDate = DateTime.TryParse(ureq.birthday, out birthday);
                             if (isDate && birthday != DateTime.MinValue)
@@ -150,9 +156,9 @@ namespace fns.API
                             user.Avatar = ureq.avatar;
                             db.User.Update(user);
                             db.SaveChanges();
-                            return JsonConvert.SerializeObject(new ResponseCommon("0000", "修改成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel() })), new commParameter(ureq.loginUserId, ureq.transId)));
+                            return JsonConvert.SerializeObject(new ResponseCommon("0000", "修改成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel(settings.Value.ServerPath) })), new commParameter(ureq.loginUserId, ureq.transId)));
                         }
-                        return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名不能为空！", null, new commParameter(ureq.loginUserId, ureq.transId)));
+                        return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该用户！", null, new commParameter(ureq.loginUserId, ureq.transId)));
                     }
                 }
                 return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));

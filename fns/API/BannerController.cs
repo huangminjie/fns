@@ -9,14 +9,20 @@ using fns.Utils;
 using Newtonsoft.Json;
 using fns.Models.API.Request;
 using fns.Models.API.Response.Banner;
+using Microsoft.AspNetCore.Hosting;
+using fns.Models.Global;
+using Microsoft.Extensions.Options;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace fns.API
 {
     [Route("api/[controller]")]
-    public class BannerController : Controller
+    public class BannerController : BaseController
     {
-        private FinancialNewsContext db = new FinancialNewsContext();
+        public BannerController(IHostingEnvironment environment, IOptions<AppSettings> settings) : base(environment, settings)
+        {
+
+        }
         // GET: api/values
         [HttpPost("GetBanners")]
         public string GetBanners([FromBody]RequestCommon req)
@@ -34,7 +40,7 @@ namespace fns.API
                             banners.Add(new bannerResponse()
                             {
                                 linkUrl = o.LinkUrl,
-                                picUrl = o.PicUrl,
+                                picUrl = settings.Value.ServerPath + o.PicUrl,
                                 type = o.Type ?? (int)BannerRedirectTypeEnum.In
                             });
                         });

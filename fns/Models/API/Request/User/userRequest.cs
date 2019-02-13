@@ -8,7 +8,7 @@ namespace fns.Models.API.Request.User
     public class userRequest : RequestBase
     {
         public int id { get; set; }
-        public string name { get; set; }
+        //public string name { get; set; }
         public string password { get; set; }
         public string avatar { get; set; }
         public int gender { get; set; }

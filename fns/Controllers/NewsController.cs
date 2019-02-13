@@ -105,7 +105,7 @@ namespace fns.Controllers
         {
             try
             {
-                var picUrlList = string.Join(",", req.picUrlList.ToArray());
+                var picUrlList = string.Join("_,_", req.picUrlList.ToArray());
                 db.News.Add(new News()
                 {
                     Auth = "",

@@ -12,14 +12,14 @@ namespace fns.Utils.API
     public static class APIModelExtentions
     {
         private static FinancialNewsContext db = new FinancialNewsContext();
-        public static userResponse ToViewModel(this User model)
+        public static userResponse ToViewModel(this User model, string serverPath)
         {
             userResponse vModel = new userResponse();
             vModel.id = model.Id;
             vModel.name = model.Name;
             vModel.birthday = model.Birthday.ToDate();
             vModel.gender = model.Gender ?? (int)UserGenderEnum.Unknown;
-            vModel.avatar = model.Avatar;
+            vModel.avatar = serverPath + model.Avatar;
             vModel.status = model.Status;
             return vModel;
         }
@@ -39,7 +39,17 @@ namespace fns.Utils.API
             }
             vModel.cName = model.C == null? "" : model.C.Name;
             vModel.auth = model.Auth;
-            vModel.picUrlList = model.PicUrlList;
+
+
+            vModel.picUrlList = new List<string>();
+            List<string> piclist = model.PicUrlList.Split("_,_").ToList();
+            piclist.ForEach(url=> {
+                if (url.StartsWith("/upload/"))
+                    vModel.picUrlList.Add(serverPath + url);//加上服务器地址
+                else
+                    vModel.picUrlList.Add(url);
+            });
+
             vModel.tag = model.Tag ?? 0;
             vModel.upCount = model.UpCount ?? 0;
             vModel.viewCount = model.ViewCount ?? 0;

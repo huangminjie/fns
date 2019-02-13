@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using fns.Utils.API;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Hosting;
+using fns.Models.Global;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -21,13 +23,11 @@ namespace fns.API
     public class NewsController : BaseController
     {
 
-        public NewsController(IOptions<Models.Global.AppSettings> settings) : base(settings)
+        public NewsController(IHostingEnvironment environment, IOptions<AppSettings> settings) : base(environment, settings)
         {
 
         }
-
-        public static string ServerPath = "";
-        private FinancialNewsContext db = new FinancialNewsContext();
+        
 
         [HttpPost("GetById")]
         public string GetById([FromBody]RequestCommon req)
