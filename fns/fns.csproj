@@ -18,17 +18,12 @@
     <Folder Include="Views\Banner\" />
     <Folder Include="Views\Splash\" />
     <Folder Include="wwwroot\js\splash\" />
+    <Folder Include="wwwroot\upload\banner\" />
     <Folder Include="wwwroot\upload\news\" />
     <Folder Include="wwwroot\upload\splash\" />
     <Folder Include="wwwroot\js\banner\" />
     <Folder Include="wwwroot\css\banner\" />
     <Folder Include="Views\User\" />
     <Folder Include="wwwroot\js\user\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="wwwroot\lib\jqPaginator-2.0.1\.circleci\config.yml" />
-    <None Include="wwwroot\lib\jqPaginator-2.0.1\.github\ISSUE_TEMPLATE.md" />
-    <None Include="wwwroot\lib\jqPaginator-2.0.1\.github\lock.yml" />
   </ItemGroup>
 </Project>

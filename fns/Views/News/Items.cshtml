@@ -5,30 +5,49 @@
     <tr>
         <td>@item.id</td>
         <td>@item.title</td>
-        <td>@item.content</td>
+        <td>@item.auth</td>
         <td>@item.insDt</td>
         <td style="display:flex;">
             <a href="javascript:void(0);" onclick="gotoEditNews(@item.id)"><i class="fa fa-pencil fa-fw"></i></a>
-            <a href="#myModal" role="button" data-toggle="modal"><i class="fa fa-remove fa-fw"></i></a>
+            <a href="javascript:void(0);" onclick="removeNews(@item.id)"><i class="fa fa-remove fa-fw"></i></a>
         </td>
     </tr>
 }
+    <script>
 
-<script>
-        function gotoEditNews(id) {
-            $.ajax({
-                url: '/News/EditNews',
-                type: 'GET',
-                contentType: 'application/json; charset=utf-8',//'application/x-www-form-urlencoded;charset=utf-8',//
-                data: { "id": id },
-                async: true,
-                success: function (data, status) {
-                    $("#divEditNews").html(data);
-                    $("#divNewsList").css("display","none");
-                }
-            }); //ajax
-
-
+    function gotoEditNews(id) {
+        $.ajax({
+            url: '/News/EditNews',
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',//'application/x-www-form-urlencoded;charset=utf-8',//
+            data: { "id": id },
+            async: true,
+            success: function (data, status) {
+                $("#divEditNews").html(data);
+                $("#divNewsList").css("display", "none");
+            }
+        }); //ajax
     }
 
-</script>
+    function removeNews(id) {
+        var r = confirm("确认删除?");
+        if (r == true) {
+            $.ajax({
+                url: '/News/DeleteNews',
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({ id: id }),
+                success: function (data, status) {
+                    if (data.ok) {
+                        $("#divNewsList").parent().load("/News/Lists");
+                    }
+                    else {
+                        alert(data.message);
+                    }
+                }
+            })
+        }
+    }
+
+    </script>

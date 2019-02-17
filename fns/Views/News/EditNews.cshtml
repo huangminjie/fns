@@ -1,17 +1,43 @@
-﻿@model fns.Models.Admin.VModels.vNews
+﻿@using fns.Utils
+@model fns.Models.Admin.VModels.vNews
 
+<style>
+    .title {
+        word-break: break-word !important;
+        word-break: break-all;
+        margin: 50px 0 0;
+        font-family: -apple-system,SF UI Display,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+        font-size: 34px;
+        font-weight: 700;
+        line-height: 1.3;
+        text-align: center;
+    }
+</style>
 <div class="container">
     <div class="row">
         <h2></h2>
     </div>
     <form method="post" action="?">
-        <input type="hidden" id="fld-id" name="fld-id" value="">
+        <input type="hidden" id="fld-id" name="fld-id" value="@(Model.id)">
         <div class="row">
 
             <div class="form-group  col-md-12">
                 <label class="control-label col-md-12" for="fld-title">
-                    Title
+                    类目
+                    <select class="form-control col-md-4" asp-for="@(Model.cid)" asp-items="@ViewBag.Categories">
+                    </select>
+                </label>
+            </div>
+            <div class="form-group  col-md-12">
+                <label class="control-label col-md-12" for="fld-title">
+                    标题
                     <input id="fld-title" name="fld-title" class="form-control" placeholder="新闻标题" type="text" value="@(Model.title)">
+                </label>
+            </div>
+            <div class="form-group  col-md-12">
+                <label class="control-label col-md-12" for="fld-title">
+                    作者
+                    <input id="fld-auth" name="fld-auth" class="form-control" placeholder="作者" type="text" value="@(Model.auth)">
                 </label>
             </div>
 
@@ -36,15 +62,15 @@
 
 
 
-            <div class="form-group col-md-12" id="divNewsContent">
-                <div id="editor">
+            <div class="form-group col-md-12" id="divNewsContent" style="display:none;">
+                <div id="editor" class="col-md-12">
                     <p>欢迎使用 <b>wangEditor</b> 富文本编辑器</p>
                 </div>
             </div>
-            <div class="form-group col-md-12" id="divNewsDoRef">
+            <div class="form-group col-md-12" id="divNewsDoRef" style="display:none;">
                 <label class="control-label col-md-12" for="fld-title">
                     新闻外链
-                    <input id="fld-doref" name="fld-title" class="form-control" placeholder="新闻外链" type="text" value="@(Model.doRef)">
+                    <input id="fld-doref" name="fld-doRef" class="form-control" placeholder="新闻外链" type="text" value="@(Model.doRef)">
                 </label>
             </div>
         </div>
@@ -64,11 +90,20 @@
 </div>
 <input type="hidden" id="txtServerPath" value="@ViewData["ServerPath"]" />
 <input type="hidden" id="txtNewsDetail" value="@Model.content" />
-<div class="container" style="margin: 20px auto;font-size: 20px;">
-    <label>预览</label>
-</div>
-<div id="divNewsPreview">
+<div id="divPreview" class="container" style="margin: auto;width:580px; margin-top:50px; display:none;">
+    <label style="font-size: 20px;">预览</label>
 
-</div>
+    <div>
+        <h1 class="title" id="preTitle"></h1>
+        <div style="width:90%;margin:20px auto; text-align:center;" id="preAuthor"></div>
+    </div>
+    <div id="divNewsPreview">
 
+    </div>
+</div>
+<script>
+    //初始化数据给js使用
+    var isEdit = '@(Model.id > 0 ? 1 : 0)';
+    var isInnerNews = '@(string.IsNullOrEmpty(Model.doRef))';
+</script>
 <script type="text/javascript" src="/js/news/edit.js"></script>

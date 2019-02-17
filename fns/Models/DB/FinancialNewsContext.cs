@@ -147,15 +147,9 @@ namespace fns.Models.DB
                     .HasColumnName("insDT")
                     .HasColumnType("datetime");
 
-                entity.Property(e => e.MinVer)
-                    .IsRequired()
-                    .HasColumnName("minVer")
-                    .HasMaxLength(50);
+                entity.Property(e => e.MinVer).HasColumnName("minVer");
 
-                entity.Property(e => e.NewVer)
-                    .IsRequired()
-                    .HasColumnName("newVer")
-                    .HasMaxLength(50);
+                entity.Property(e => e.NewVer).HasColumnName("newVer");
 
                 entity.Property(e => e.UpdateDesc)
                     .IsRequired()

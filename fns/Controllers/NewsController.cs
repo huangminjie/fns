@@ -15,6 +15,7 @@ using fns.Models.Global;
 using fns.Models.Admin;
 using Microsoft.EntityFrameworkCore;
 using fns.Models.Admin.Request;
+using fns.Utils;
 
 namespace fns.Controllers
 {
@@ -32,13 +33,13 @@ namespace fns.Controllers
         }
 
         [AllowAnonymous]
-        public IActionResult Detail(int id)
+        public async Task<IActionResult> Detail(int id)
         {
             try
             {
-                var item = db.News.SingleOrDefault(n => n.Id == id);
+                var item = await db.News.SingleOrDefaultAsync(n => n.Id == id);
                 if (item != null)
-                    return View(new vNews() { id = item.Id, content = item.Content, doRef = item.DoRef, auth = item.Auth, title = item.Title, insDt = item.InsDt?.ToString("yyyy/MM/dd") });
+                    return PartialView(item.ToViewModel());
 
                 return Content("找不到该文章！");
             }
@@ -49,14 +50,14 @@ namespace fns.Controllers
             return Content("找不到该文章！");
         }
 
-        public IActionResult Lists()
+        public async Task<IActionResult> Lists(int? pi)
         {
             try
             {
-                var pi = 1;
+                pi = pi == null ? 1 : pi;
                 var ps = 10;
-                var total = db.News.Count();
-                var loadData = db.News.Skip((pi - 1) * ps).Take(ps).ToList();
+                var total = await db.News.CountAsync();
+                var loadData = await db.News.Skip(((pi ?? 0) - 1) * ps).Take(ps).ToListAsync();
                 return PartialView(new GridPagination() { ps = ps, total = total });
             }
             catch (Exception ex)
@@ -67,11 +68,11 @@ namespace fns.Controllers
         }
 
 
-        public IActionResult Items(int ps, int pi)
+        public async Task<IActionResult> Items(int ps, int pi)
         {
             try
             {
-                var list = db.News.Skip((pi - 1) * ps).Take(ps).ToList();
+                var list = await db.News.Skip((pi - 1) * ps).Take(ps).ToListAsync();
                 var vList = list.Select(news => news.ToViewModel()).ToList();
                 return PartialView(vList);
             }
@@ -84,14 +85,15 @@ namespace fns.Controllers
 
         //[CacheControl(HttpCacheability.NoCache), HttpGet]
         [HttpGet]
-        public IActionResult EditNews(int id)
+        public async Task<IActionResult> EditNews(int id)
         {
             try
             {
+                ViewBag.Categories = DropdownListUntil.CategoryDropDownList();
                 ViewData["ServerPath"] = settings.Value.ServerPath; // log the serverpath
-                var item = db.News.SingleOrDefault(n => n.Id == id);
+                var item = await db.News.SingleOrDefaultAsync(n => n.Id == id);
                 if (item != null)
-                    return PartialView(new vNews() { id = item.Id, content = item.Content, doRef = item.DoRef, auth = item.Auth, title = item.Title, insDt = item.InsDt?.ToString("yyyy/MM/dd") });
+                    return PartialView(item.ToViewModel());
                 return PartialView(new vNews());
             }
             catch (Exception ex)
@@ -101,32 +103,69 @@ namespace fns.Controllers
             return Content("出错啦!");
         }
 
-        public string SaveNews([FromBody]vNews req)
+        [HttpPost]
+        public async Task<Response> SaveNews([FromBody]vNews req)
         {
             try
             {
-                var picUrlList = string.Join("_,_", req.picUrlList.ToArray());
-                db.News.Add(new News()
+                News model = null;
+                var isAdd = true;
+                if (req.id == 0)
+                    model = new News();
+                else
                 {
-                    Auth = "",
-                    Cid = 2, // 娱乐
-                    DoRef = req.doRef,
-                    Content = req.content,
-                    InsDt = DateTime.Now,
-                    PicUrlList = picUrlList,
-                    Title = req.title,
-                    Status = 0
-                });
-                db.SaveChanges();
+                    isAdd = false;
+                    model = await db.News.SingleOrDefaultAsync(n => n.Id == req.id);
+                }
+                
 
+                var picUrlList = string.Join("_,_", req.picUrlList.ToArray());
+
+
+                model.Cid = req.cid;
+                model.Title = req.title;
+                model.Auth = req.auth;
+                model.Content = req.content;
+                model.DoRef = req.doRef;
+                model.PicUrlList = picUrlList;
+                model.InsDt = DateTime.Now;
+                model.Status = (int)NewsStatusEnum.Normal;
+
+                if(isAdd)
+                    db.News.Add(model);
+
+                await db.SaveChangesAsync();
+                return new Response(true);
             }
             catch (Exception ex)
             {
-
-                throw;
+                return new Response(false, ex.Message , null);
             }
-            return "ok";
         }
+
+        [HttpPost]
+        public async Task<Response> DeleteNews([FromBody]DeleteRequest req)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(req.id))
+                {
+                    var news = await db.News.SingleOrDefaultAsync(o => o.Id == Convert.ToInt32(req.id));
+                    if (news != null) {
+                        db.News.Remove(news);
+                        await db.SaveChangesAsync();
+                        return new Response(true);
+                    }
+                }
+
+                return new Response(false, "请选择要删除的新闻！");
+            }
+            catch (Exception ex)
+            {
+                return new Response(false, ex.Message);
+            }
+        }
+
 
         public IActionResult CategoryLists()
         {

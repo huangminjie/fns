@@ -38,4 +38,9 @@ namespace fns.Utils
         Recommend = 3, //推荐 
         Special = 4//专题
     }
+
+    public enum NewsStatusEnum
+    {
+        Normal = 0 //正常
+    }
 }

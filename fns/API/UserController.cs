@@ -153,7 +153,8 @@ namespace fns.API
                             if (isDate && birthday != DateTime.MinValue)
                                 user.Birthday = birthday;
                             user.Gender = ureq.gender;
-                            user.Avatar = ureq.avatar;
+                            if(!string.IsNullOrEmpty(ureq.avatar))
+                                user.Avatar = ureq.avatar;
                             db.User.Update(user);
                             db.SaveChanges();
                             return JsonConvert.SerializeObject(new ResponseCommon("0000", "修改成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel(settings.Value.ServerPath) })), new commParameter(ureq.loginUserId, ureq.transId)));

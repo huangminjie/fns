@@ -3,7 +3,7 @@
 <script src="~/lib/wangEditor/wangEditor.js"></script>
 <div id="divNewsList">
     <div class="btn-toolbar">
-        <button class="btn btn-primary">新建</button>
+        <button class="btn btn-primary" onclick="gotoEditNews(0)">新建</button>
     </div>
     <div class="well">
         <table class="table">
@@ -11,7 +11,7 @@
                 <tr>
                     <th>序号</th>
                     <th>标题</th>
-                    <th>内容</th>
+                    <th>作者</th>
                     <th>创建时间</th>
                     <th style="width: 36px;"></th>
                 </tr>
@@ -34,10 +34,11 @@
             pageSize: @(Model.ps),
             currentPage: 1,
             onPageChange: function (pi, type) {
-                $('#divCurrentPI').html('当前第' + pi + '页');
+                $('#divCurrentPI').html('当前第<span id="spPINews">' + pi + '</span>页, 共<span id="spTotalNews">' + @(Model.total)  + '</span>条新闻');
                 $("#tbNews").load("/News/Items", { "ps": @(Model.ps), "pi": pi}, function () { });
             }
         });
 
     })
+
 </script>
