@@ -57,7 +57,7 @@ namespace fns.Controllers
                 pi = pi == null ? 1 : pi;
                 var ps = 10;
                 var total = await db.News.CountAsync();
-                var loadData = await db.News.Skip(((pi ?? 0) - 1) * ps).Take(ps).ToListAsync();
+                var loadData = await db.News.OrderByDescending(o => o.InsDt).Skip(((pi ?? 0) - 1) * ps).Take(ps).ToListAsync();
                 return PartialView(new GridPagination() { ps = ps, total = total });
             }
             catch (Exception ex)
@@ -72,7 +72,7 @@ namespace fns.Controllers
         {
             try
             {
-                var list = await db.News.Skip((pi - 1) * ps).Take(ps).ToListAsync();
+                var list = await db.News.OrderByDescending(o => o.InsDt).Skip((pi - 1) * ps).Take(ps).ToListAsync();
                 var vList = list.Select(news => news.ToViewModel()).ToList();
                 return PartialView(vList);
             }
@@ -117,21 +117,19 @@ namespace fns.Controllers
                     isAdd = false;
                     model = await db.News.SingleOrDefaultAsync(n => n.Id == req.id);
                 }
-                
-
-                var picUrlList = string.Join("_,_", req.picUrlList.ToArray());
-
-
                 model.Cid = req.cid;
                 model.Title = req.title;
                 model.Auth = req.auth;
                 model.Content = req.content;
                 model.DoRef = req.doRef;
-                model.PicUrlList = picUrlList;
+                model.Type = req.type;
+                var picUrlList = string.Join("_,_", req.picUrlList.ToArray());
+                if (!string.IsNullOrEmpty(picUrlList))
+                    model.PicUrlList = picUrlList;
                 model.InsDt = DateTime.Now;
                 model.Status = (int)NewsStatusEnum.Normal;
 
-                if(isAdd)
+                if (isAdd)
                     db.News.Add(model);
 
                 await db.SaveChangesAsync();
@@ -217,6 +215,8 @@ namespace fns.Controllers
                 if (!string.IsNullOrEmpty(req.id))
                 {
                     var category = await db.Category.SingleOrDefaultAsync(o => o.Id == Convert.ToInt32(req.id));
+                    if (category.News.Count > 0 || category.Banner.Count > 0)
+                        return new Response(false, "该类目正被使用，无法删除！");
                     db.Category.Remove(category);
                     await db.SaveChangesAsync();
                     return new Response(true);

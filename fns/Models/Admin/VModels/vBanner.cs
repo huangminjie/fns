@@ -7,5 +7,7 @@ namespace fns.Models.Admin.VModels
         public string linkUrl { get; set; }
         public string picUrl { get; set; }
         public string type { get; set; }
+        public string cid { get; set; }
+        public string cName { get; set; }
     }
 }

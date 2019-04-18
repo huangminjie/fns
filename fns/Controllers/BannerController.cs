@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using fns.Models.Admin.VModels;
 using fns.Models.DB;
 using fns.Models.Admin.Request;
+using fns.Utils;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -34,18 +35,30 @@ namespace fns.Controllers
         {
             try
             {
+                var categories = DropdownListUntil.CategoryDropDownList().ToList();
                 var list = new List<vBanner>();
                 await db.Banner.ForEachAsync(o =>
                 {
+                    string categoryName = "";
+                    if (o.C != null)
+                        categoryName = o.C.Name;
+                    else
+                    {
+                        var category = db.Category.SingleOrDefaultAsync(c => c.Id == o.Cid);
+                        if (category != null)
+                            categoryName = category.Result.Name;
+                    }
                     list.Add(new vBanner()
                     {
                         id = o.Id.ToString(),
                         picUrl = o.PicUrl,
                         linkUrl = o.LinkUrl,
-                        type = o.Type.HasValue ? o.Type.Value.ToString() : ""
+                        type = o.Type.HasValue ? o.Type.Value.ToString() : "",
+                        cid = o.Cid.ToString(),
+                        cName = categoryName
                     });
                 });
-                return new Response(true, "", list);
+                return new Response(true, "", new { categories = categories, list = list });
             }
             catch (System.Exception ex)
             {
@@ -63,7 +76,8 @@ namespace fns.Controllers
                     {
                         PicUrl = req.picUrl,
                         LinkUrl = req.linkUrl,
-                        Type = Convert.ToInt32(req.type)
+                        Type = Convert.ToInt32(req.type),
+                        Cid = Convert.ToInt32(req.cid)
                     });
                 }
                 else
@@ -72,6 +86,7 @@ namespace fns.Controllers
                     banner.PicUrl = req.picUrl;
                     banner.LinkUrl = req.linkUrl;
                     banner.Type = Convert.ToInt32(req.type);
+                    banner.Cid = Convert.ToInt32(req.cid);
                 }
                 await db.SaveChangesAsync();
                 return new Response(true);

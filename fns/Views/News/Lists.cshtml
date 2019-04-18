@@ -10,6 +10,7 @@
             <thead>
                 <tr>
                     <th>序号</th>
+                    <th>类目</th>
                     <th>标题</th>
                     <th>作者</th>
                     <th>创建时间</th>
@@ -29,16 +30,53 @@
 <br />
 <script>
     $(function () {
-        $('#paginationNewsList.pagination').jqPaginator({
-            totalCounts: @(Model.total),
-            pageSize: @(Model.ps),
-            currentPage: 1,
-            onPageChange: function (pi, type) {
-                $('#divCurrentPI').html('当前第<span id="spPINews">' + pi + '</span>页, 共<span id="spTotalNews">' + @(Model.total)  + '</span>条新闻');
-                $("#tbNews").load("/News/Items", { "ps": @(Model.ps), "pi": pi}, function () { });
-            }
-        });
+        if (parseInt(@(Model.total)) > 0) {
+            $('#paginationNewsList.pagination').jqPaginator({
+                totalCounts: @(Model.total),
+                pageSize: @(Model.ps),
+                currentPage: 1,
+                onPageChange: function (pi, type) {
+                    $('#divCurrentPI').html('当前第<span id="spPINews">' + pi + '</span>页, 共<span id="spTotalNews">' + @(Model.total)  + '</span>条新闻');
+                    $("#tbNews").load("/News/Items", { "ps": @(Model.ps), "pi": pi}, function () { });
+                }
+            });
+        }
 
     })
 
+
+    function gotoEditNews(id) {
+        $.ajax({
+            url: '/News/EditNews',
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',//'application/x-www-form-urlencoded;charset=utf-8',//
+            data: { "id": id },
+            async: true,
+            success: function (data, status) {
+                $("#divEditNews").html(data);
+                $("#divNewsList").css("display", "none");
+            }
+        }); //ajax
+    }
+
+    function removeNews(id) {
+        var r = confirm("确认删除?");
+        if (r == true) {
+            $.ajax({
+                url: '/News/DeleteNews',
+                type: 'POST',
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                data: JSON.stringify({ id: id }),
+                success: function (data, status) {
+                    if (data.ok) {
+                        $("#divNewsList").parent().load("/News/Lists");
+                    }
+                    else {
+                        alert(data.message);
+                    }
+                }
+            })
+        }
+    }
 </script>

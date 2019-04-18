@@ -37,18 +37,25 @@ namespace fns.Utils.API
             {
                 categoryName = db.Category.SingleOrDefault(o => o.Id == model.Cid)?.Name;
             }
-            vModel.cName = model.C == null? "" : model.C.Name;
+            else
+                categoryName = model.C.Name;
+            vModel.cName = categoryName;
             vModel.auth = model.Auth;
+            vModel.type = model.Type;
 
 
             vModel.picUrlList = new List<string>();
-            List<string> piclist = model.PicUrlList.Split("_,_").ToList();
-            piclist.ForEach(url=> {
-                if (url.StartsWith("/upload/"))
-                    vModel.picUrlList.Add(serverPath + url);//加上服务器地址
-                else
-                    vModel.picUrlList.Add(url);
-            });
+            if (!string.IsNullOrEmpty(model.PicUrlList))
+            {
+                List<string> piclist = model.PicUrlList.Split("_,_").ToList();
+                piclist.ForEach(url =>
+                {
+                    if (url.StartsWith("/upload/"))
+                        vModel.picUrlList.Add(serverPath + url);//加上服务器地址
+                    else
+                        vModel.picUrlList.Add(url);
+                });
+            }
 
             vModel.tag = model.Tag ?? 0;
             vModel.upCount = model.UpCount ?? 0;

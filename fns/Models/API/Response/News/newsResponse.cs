@@ -15,6 +15,7 @@ namespace fns.Models.API.Response.News
         public int cid { get; set; }
         public string cName { get; set; }
         public string auth { get; set; }
+        public int type { get; set; }
         public List<string> picUrlList { get; set; }
         public int tag { get; set; }
         public int upCount { get; set; }

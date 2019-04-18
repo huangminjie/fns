@@ -23,9 +23,8 @@
 
             <div class="form-group  col-md-12">
                 <label class="control-label col-md-12" for="fld-title">
-                    类目
-                    <select class="form-control col-md-4" asp-for="@(Model.cid)" asp-items="@ViewBag.Categories">
-                    </select>
+                    新闻类目
+                    <select class="form-control col-md-4" asp-for="@(Model.cid)" asp-items="@ViewBag.Categories"></select>
                 </label>
             </div>
             <div class="form-group  col-md-12">
@@ -41,20 +40,37 @@
                 </label>
             </div>
 
+            <div class="form-group col-md-12">
+                <label class="control-label col-md-12" for="fld-type">
+                    浏览器跳转方式
+                </label>
+                <div class="col-md-12">
+                    <label class="radio-inline" for="fld-type-0">
+                        <input type="radio" name="fld-type" id="fld-type-0" value="自带浏览器跳转">
+                        自带浏览器跳转
+                    </label>
+                    <label class="radio-inline" for="fld-type-1">
+                        <input type="radio" name="fld-type" id="fld-type-1" value="外部浏览器跳转">
+                        外部浏览器跳转
+                    </label>
+                </div>
+            </div>
+
 
             <div class="form-group col-md-3">
-                <label class=" control-label col-md-12" for="fld-context">
-                    <div>
-                        <label class="radio-inline" for="fld-context-0">
-                            <input type="radio" name="fld-context" id="fld-context-0" value="内容">
-                            内容
-                        </label>
-                        <label class="radio-inline" for="fld-context-1">
-                            <input type="radio" name="fld-context" id="fld-context-1" value="使用外链">
-                            使用外链
-                        </label>
-                    </div>
+                <label class="control-label col-md-12" for="fld-context">
+                    新闻编辑方式
                 </label>
+                <div class="col-md-12">
+                    <label class="radio-inline" for="fld-context-0">
+                        <input type="radio" name="fld-context" id="fld-context-0" value="内容">
+                        内容
+                    </label>
+                    <label class="radio-inline" for="fld-context-1">
+                        <input type="radio" name="fld-context" id="fld-context-1" value="使用外链">
+                        使用外链
+                    </label>
+                </div>
             </div>
 
 
@@ -105,5 +121,6 @@
     //初始化数据给js使用
     var isEdit = '@(Model.id > 0 ? 1 : 0)';
     var isInnerNews = '@(string.IsNullOrEmpty(Model.doRef))';
+    var type = parseInt('@(Model.type)');
 </script>
 <script type="text/javascript" src="/js/news/edit.js"></script>

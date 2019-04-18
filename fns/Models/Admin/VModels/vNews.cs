@@ -13,6 +13,8 @@ namespace fns.Models.Admin.VModels
         public string insDt { get; set; }
         public string doRef { get; set; }
         public int cid { get; set; }
+        public string cName { get; set; }
+        public int type { get; set; }
         public string auth { get; set; }
         public List<string> picUrlList { get; set; }
         public int tag { get; set; }

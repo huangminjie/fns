@@ -61,6 +61,10 @@ function submitNews() {
         return;
     }
 
+    var type = 1; //默认，自带浏览器跳转
+    if ($("#fld-type-1").is(":checked")) {
+        type = 2; //外部浏览器跳转
+    } 
 
     var content = editorNews.txt.html();
     if ($("#fld-context-0").is(":checked")) {
@@ -87,7 +91,7 @@ function submitNews() {
         url: '/News/SaveNews',
         type: 'POST',
         contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify({ "id": $("#fld-id").val(), "cid": $("#cid").val(), "title": $("#fld-title").val(), "auth": $("#fld-auth").val(), "content": content, "doRef": $("#fld-doref").val(), "picUrlList": picsList }),
+        data: JSON.stringify({ "id": $("#fld-id").val(), "cid": $("#cid").val(), "type": type, "title": $("#fld-title").val(), "auth": $("#fld-auth").val(), "content": content, "doRef": $("#fld-doref").val(), "picUrlList": picsList }),
         async: true,
         success: function (data, status) {
             refreshNews();
@@ -170,8 +174,7 @@ $(function () {
             $("#divNewsPreview").html("");
         }
     });
-
-    console.log("isInnerNews  "+isInnerNews);
+    
     if (isInnerNews == "True") {
         loadPreView();
         $("#fld-context-0").prop("checked", "checked");
@@ -180,5 +183,20 @@ $(function () {
     else {
         $("#fld-context-1").prop("checked", "checked");
         $("#fld-context-1").click();
+    }
+
+    //选择浏览器跳转方式
+    if (type == 1) {
+        $("#fld-type-0").prop("checked", "checked");
+        $("#fld-type-0").click();
+    }
+    else if (type == 2) {
+        $("#fld-type-1").prop("checked", "checked");
+        $("#fld-type-1").click();
+    }
+    else {
+        //默认
+        $("#fld-type-0").prop("checked", "checked");
+        $("#fld-type-0").click();
     }
 })

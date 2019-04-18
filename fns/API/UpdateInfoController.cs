@@ -9,6 +9,7 @@ using fns.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using fns.Models.API.Response.UpdateInfo;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -20,7 +21,7 @@ namespace fns.API
         private fnsContext db = new fnsContext();
         
         [HttpPost("GetUpdateInfo")]
-        public string GetUpdateInfo([FromBody]RequestCommon req)
+        public async Task<string> GetUpdateInfo([FromBody]RequestCommon req)
         {
             try
             {
@@ -31,7 +32,7 @@ namespace fns.API
                     {
                         RequestBase rreq = JsonConvert.DeserializeObject<RequestBase>(reqStr);
                         updateInfoResponse uir = new updateInfoResponse();
-                        var lastOne = db.Updateinfo.OrderByDescending(o=>o.InsDt ?? DateTime.MinValue).FirstOrDefault();
+                        var lastOne = await db.Updateinfo.OrderByDescending(o => o.InsDt ?? DateTime.MinValue).FirstOrDefaultAsync();
                         if (lastOne != null)
                         {
                             uir.id = lastOne.Id;

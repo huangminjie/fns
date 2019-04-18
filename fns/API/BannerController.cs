@@ -12,6 +12,8 @@ using fns.Models.API.Response.Banner;
 using Microsoft.AspNetCore.Hosting;
 using fns.Models.Global;
 using Microsoft.Extensions.Options;
+using fns.Models.API.Request.Banner;
+using Microsoft.EntityFrameworkCore;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace fns.API
@@ -25,7 +27,7 @@ namespace fns.API
         }
         // GET: api/values
         [HttpPost("GetBanners")]
-        public string GetBanners([FromBody]RequestCommon req)
+        public async Task<string> GetBanners([FromBody]RequestCommon req)
         {
             try
             {
@@ -34,13 +36,15 @@ namespace fns.API
                     var reqStr = DESUtil.DecryptCommonParam(req.d);
                     if (!string.IsNullOrEmpty(reqStr))
                     {
-                        RequestBase rreq = JsonConvert.DeserializeObject<RequestBase>(reqStr);
+                        bannerRequest rreq = JsonConvert.DeserializeObject<bannerRequest>(reqStr);
                         List<bannerResponse> banners = new List<bannerResponse>();
-                        db.Banner.ToList().ForEach(o => {
+                        var bannerList = await db.Banner.Where(o => o.Cid == rreq.cid).ToListAsync();
+                        bannerList.ForEach(o => {
                             banners.Add(new bannerResponse()
                             {
                                 linkUrl = o.LinkUrl,
                                 picUrl = settings.Value.ServerPath + o.PicUrl,
+                                cid = o.Cid,
                                 type = o.Type ?? (int)BannerRedirectTypeEnum.In
                             });
                         });

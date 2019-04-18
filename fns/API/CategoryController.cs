@@ -9,6 +9,7 @@ using fns.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using fns.Models.API.Response.Category;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -21,7 +22,7 @@ namespace fns.API
 
 
         [HttpPost("GetCategories")]
-        public string GetCategories([FromBody]RequestCommon req)
+        public async Task<string> GetCategories([FromBody]RequestCommon req)
         {
             try
             {
@@ -31,9 +32,11 @@ namespace fns.API
                     if (!string.IsNullOrEmpty(reqStr))
                     {
                         RequestBase rreq = JsonConvert.DeserializeObject<RequestBase>(reqStr);
-                        List<categoryResponse> list= new List<categoryResponse>();
-                        db.Category.ToList().ForEach(c =>{
-                            list.Add(new categoryResponse() {
+                        List<categoryResponse> list = new List<categoryResponse>();
+                        var categories = await db.Category.ToListAsync();
+                        categories.ForEach(c => {
+                            list.Add(new categoryResponse()
+                            {
                                 id = c.Id,
                                 name = c.Name
                             });

@@ -262,3 +262,4 @@ __pycache__/
 /fns/Properties/PublishProfiles
 
 *.DS_Store
+/fns/wwwroot/upload

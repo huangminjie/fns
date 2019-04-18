@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using fns.Models.DB;
+﻿using fns.Models.API;
 using fns.Models.API.Request;
 using fns.Models.API.Request.User;
-using System.Security.Cryptography;
-using fns.Models.API;
+using fns.Models.Global;
 using fns.Utils;
 using fns.Utils.API;
-using Newtonsoft.Json;
-using System.Net.Http;
-using System.Net;
 using Microsoft.AspNetCore.Hosting;
-using fns.Models.Global;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using System;
+using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -33,7 +28,8 @@ namespace fns.API
         [HttpGet("{id}")]
         public string Get(int id)
         {
-            return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "1", transId = "sdfsd", cid = 2, ps = 15, op = 0, id = 0 }));
+            return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "1", transId = "sdfsd", cid = 9 }));
+            //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "1", transId = "sdfsd", cid = 2, ps = 15, op = 0, id = 0 }));
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "1", transId = "sdfsd", id = 2 }));
             //return DESUtil.DecryptCommonParam("Kinv8nJpClfbtu2i6lajWjv7OzcJ1k0mvbR4qRli4jsw1uWvG6hZBTU5BTQ+x/cXWBXlSebQGj/i6+JdSGuqV6yor8elj9hOT4OvOnIGbI78qho+i97xguh4zZEEusGq4viCXED5rLF/cDAl1BzRZGfWXpVtLFoZxpp4tAcjp97U5CXWSaEPkraMroflYSc3mktSdQWkTMtGBhGwML1wE7QjoHd+rN7rTm2RGgTL9n0Ot1UcDncK0UbsdVVyxCxkx1Io7Ojk1lKl9GVrOcg5wNbR2fYahtfhQusKGdC+QddKW9rUjzU/12oobUYRlee1cjMu3u7bogrAZ9nnlENUYzFzAz6iUWMM");
             //register
@@ -60,7 +56,7 @@ namespace fns.API
                         registRequest rreq = JsonConvert.DeserializeObject<registRequest>(reqStr);
                         if (!string.IsNullOrEmpty(rreq.name) && !string.IsNullOrEmpty(rreq.password))
                         {
-                            if (db.User.Any(u => u.Name == rreq.name))
+                            if (await db.User.AnyAsync(u => u.Name == rreq.name))
                                 return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名已存在！", null, new commParameter(rreq.loginUserId, rreq.transId)));
 
                             var user = new Models.DB.User()
@@ -78,7 +74,7 @@ namespace fns.API
                             //if (isDate && birthday != DateTime.MinValue)
                             //    user.Birthday = birthday;
 
-                            db.User.Add(user);
+                            await db.User.AddAsync(user);
                             await db.SaveChangesAsync();
                             return JsonConvert.SerializeObject(new ResponseCommon("0000", "注册成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel(settings.Value.ServerPath) })), new commParameter(rreq.loginUserId, rreq.transId)));
                         }
@@ -95,7 +91,7 @@ namespace fns.API
 
         // POST api/values
         [HttpPost("login")]
-        public string Login([FromBody]RequestCommon req)
+        public async Task<string> Login([FromBody]RequestCommon req)
         {
             try
             {
@@ -105,7 +101,7 @@ namespace fns.API
                     if (!string.IsNullOrEmpty(reqStr))
                     {
                         loginRequest lreq = JsonConvert.DeserializeObject<loginRequest>(reqStr);
-                        var user = db.User.FirstOrDefault(u => u.Name == lreq.name);
+                        var user = await db.User.FirstOrDefaultAsync(u => u.Name == lreq.name);
                         if (user != null)
                         {
                             if (user.Password == DES_MD5Util.Encrypt(lreq.password))
@@ -128,7 +124,7 @@ namespace fns.API
 
         // PUT api/values/5
         [HttpPost("update")]
-        public string Update([FromBody]RequestCommon req)
+        public async Task<string> Update([FromBody]RequestCommon req)
         {
             try
             {
@@ -140,7 +136,7 @@ namespace fns.API
                         userRequest ureq = JsonConvert.DeserializeObject<userRequest>(reqStr);
                         if (ureq.id != 0)
                         {
-                            var user = db.User.SingleOrDefault(u => u.Id == ureq.id);
+                            var user = await db.User.SingleOrDefaultAsync(u => u.Id == ureq.id);
                             if (user == null)
                                 return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该用户！", null, new commParameter(ureq.loginUserId, ureq.transId)));
 
@@ -156,10 +152,46 @@ namespace fns.API
                             if(!string.IsNullOrEmpty(ureq.avatar))
                                 user.Avatar = ureq.avatar;
                             db.User.Update(user);
-                            db.SaveChanges();
+                            await db.SaveChangesAsync();
                             return JsonConvert.SerializeObject(new ResponseCommon("0000", "修改成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel(settings.Value.ServerPath) })), new commParameter(ureq.loginUserId, ureq.transId)));
                         }
                         return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该用户！", null, new commParameter(ureq.loginUserId, ureq.transId)));
+                    }
+                }
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", ex.Message, null, new commParameter("", "")));
+            }
+        }
+
+        // POST api/values
+        [HttpPost("updatepassword")]
+        public async Task<string> UpdatePassword([FromBody]RequestCommon req)
+        {
+            try
+            {
+                if (req != null && req.d != null)
+                {
+                    var reqStr = DESUtil.DecryptCommonParam(req.d);
+                    if (!string.IsNullOrEmpty(reqStr))
+                    {
+                        passwordRequest rreq = JsonConvert.DeserializeObject<passwordRequest>(reqStr);
+                        if (!string.IsNullOrEmpty(rreq.oldPassword) && !string.IsNullOrEmpty(rreq.newPassword))
+                        {
+                            var user = await db.User.SingleOrDefaultAsync(u => u.Id == rreq.id);
+                            if (user == null)
+                                return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该用户！", null, new commParameter(rreq.loginUserId, rreq.transId)));
+                            if (DES_MD5Util.Encrypt(rreq.oldPassword) != user.Password)
+                                return JsonConvert.SerializeObject(new ResponseCommon("0002", "旧密码不正确！", null, new commParameter(rreq.loginUserId, rreq.transId)));
+
+                            user.Password = DES_MD5Util.Encrypt(rreq.newPassword);
+
+                            await db.SaveChangesAsync();
+                            return JsonConvert.SerializeObject(new ResponseCommon("0000", "密码修改成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel(settings.Value.ServerPath) })), new commParameter(rreq.loginUserId, rreq.transId)));
+                        }
+                        return JsonConvert.SerializeObject(new ResponseCommon("0002", "密码不能为空！", null, new commParameter(rreq.loginUserId, rreq.transId)));
                     }
                 }
                 return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));

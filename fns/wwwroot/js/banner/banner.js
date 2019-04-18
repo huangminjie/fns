@@ -1,4 +1,5 @@
 ﻿var bannerList = [];
+var categories = [];
 $(function () {
     search();
 });
@@ -9,11 +10,13 @@ function search() {
         success: function (data, status) {
             if (data.ok) {
                 $("tbody").empty();
-                bannerList = data.resData;
-                data.resData.forEach((item) => {
+                bannerList = data.resData.list;
+                categories = data.resData.categories;
+                data.resData.list.forEach((item) => {
                     var tr = `
                     <tr>
                         <td>${item.id}</td>
+                        <td>${item.cName}</td>
                         <td>
                             <img src="${item.picUrl}" style="height: 60px;width: 60px;" />
                         </td>
@@ -35,10 +38,15 @@ function search() {
     })
 }
 function openModal(id) {
+    $("#cid").html("");
+    categories.forEach(c => {
+        $("#cid").append('<option value= "' + c.value + '" > ' + c.text + '</option>');
+    });
     if (id) {
         var data = bannerList.find(o => o.id == id);
         $("#modalTitle").html("修改");
         $("#id").val(data.id);
+        $("#cid").val(data.cid);
         $("#linkUrl").val(data.linkUrl);
         $("#type").val(data.type);
         $("#picUrl").val(data.picUrl);
@@ -46,6 +54,7 @@ function openModal(id) {
     }
     else {
         $("#id").val('');
+        $("#cid").val('');
         $("#linkUrl").val('');
         $("#type").val('1');
         $("#picUrl").val('');
@@ -56,15 +65,21 @@ function openModal(id) {
 }
 function save() {
     var id = $("#id").val();
+    var cid = $("#cid").val();
     var linkUrl = $("#linkUrl").val();
     var type = $("#type").val();
     var picUrl = $("#picUrl").val();
+    if (cid === '') {
+        alert("请选择类目!");
+        return false;
+    }
     if (picUrl === '') {
         alert("请选择图片!");
         return false;
     }
     var data = {
         id: id,
+        cid: cid,
         linkUrl: linkUrl,
         type: type,
         picUrl: picUrl

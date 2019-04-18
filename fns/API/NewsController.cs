@@ -14,6 +14,7 @@ using fns.Utils.API;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Hosting;
 using fns.Models.Global;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -30,7 +31,7 @@ namespace fns.API
         
 
         [HttpPost("GetById")]
-        public string GetById([FromBody]RequestCommon req)
+        public async Task<string> GetById([FromBody]RequestCommon req)
         {
             try
             {
@@ -41,7 +42,7 @@ namespace fns.API
                     {
                         newsRequest rreq = JsonConvert.DeserializeObject<newsRequest>(reqStr);
                         newsResponse news = new newsResponse();
-                        var model = db.News.SingleOrDefault(n => n.Id == rreq.id);
+                        var model = await db.News.SingleOrDefaultAsync(n => n.Id == rreq.id);
                         if (model == null)
                             return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该文章！", null, new commParameter("", "")));
                         news = model.ToViewModel(settings.Value.ServerPath);
@@ -58,7 +59,7 @@ namespace fns.API
 
         // GET api/values
         [HttpPost("GetList")]
-        public string GetList([FromBody] RequestCommon req)
+        public async Task<string> GetList([FromBody] RequestCommon req)
         {
             try
             {
@@ -71,7 +72,7 @@ namespace fns.API
                         DateTime dt = DateTime.Now;
                         List<News> list = new List<News>();
                         List<newsResponse> newsList = new List<newsResponse>();
-                        News news = db.News.SingleOrDefault(o=>o.Id == (rreq.id ?? 0));
+                        News news = await db.News.SingleOrDefaultAsync(o => o.Id == (rreq.id ?? 0));
                         if (news != null)
                         {
                             dt = news.InsDt ?? DateTime.Now;
@@ -81,12 +82,12 @@ namespace fns.API
                         //上拉获取历史数据
                         if (rreq.op == 0)
                         {
-                            list = db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title) && n.Cid == rreq.cid && n.InsDt < dt).OrderByDescending(o => o.InsDt).Take(rreq.ps).ToList();
+                            list = await db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title) && n.Cid == rreq.cid && n.InsDt < dt).OrderByDescending(o => o.InsDt).Take(rreq.ps).ToListAsync();
                         }
                         //下拉获取最新数据
                         else
                         {
-                            list = db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title) && n.Cid == rreq.cid && n.InsDt > dt).OrderBy(o => o.InsDt).Take(rreq.ps).OrderByDescending(o => o.InsDt).ToList();
+                            list = await db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title) && n.Cid == rreq.cid && n.InsDt > dt).OrderBy(o => o.InsDt).Take(rreq.ps).OrderByDescending(o => o.InsDt).ToListAsync();
                         }
                         list.ForEach(l =>
                         {

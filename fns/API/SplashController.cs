@@ -12,6 +12,7 @@ using fns.Models.API.Response.Splash;
 using Microsoft.AspNetCore.Hosting;
 using fns.Models.Global;
 using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -26,7 +27,7 @@ namespace fns.API
         }
 
         [HttpPost("GetSplash")]
-        public string GetSplash([FromBody]RequestCommon req)
+        public async Task<string> GetSplash([FromBody]RequestCommon req)
         {
             try
             {
@@ -37,7 +38,7 @@ namespace fns.API
                     {
                         RequestBase rreq = JsonConvert.DeserializeObject<RequestBase>(reqStr);
                         splashResponse splash = new splashResponse();
-                        var model = db.Splash.FirstOrDefault();
+                        var model = await db.Splash.FirstOrDefaultAsync();
                         if (model != null)
                         {
                             splash = new splashResponse()
