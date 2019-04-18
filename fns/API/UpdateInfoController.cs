@@ -17,7 +17,7 @@ namespace fns.API
     [Route("api/[controller]")]
     public class UpdateInfoController : Controller
     {
-        private FinancialNewsContext db = new FinancialNewsContext();
+        private fnsContext db = new fnsContext();
         
         [HttpPost("GetUpdateInfo")]
         public string GetUpdateInfo([FromBody]RequestCommon req)
@@ -31,7 +31,7 @@ namespace fns.API
                     {
                         RequestBase rreq = JsonConvert.DeserializeObject<RequestBase>(reqStr);
                         updateInfoResponse uir = new updateInfoResponse();
-                        var lastOne = db.UpdateInfo.OrderByDescending(o=>o.InsDt ?? DateTime.MinValue).FirstOrDefault();
+                        var lastOne = db.Updateinfo.OrderByDescending(o=>o.InsDt ?? DateTime.MinValue).FirstOrDefault();
                         if (lastOne != null)
                         {
                             uir.id = lastOne.Id;

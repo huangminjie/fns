@@ -22,7 +22,7 @@ namespace fns.Utils
             }};
 
             
-            using (var db = new FinancialNewsContext())
+            using (var db = new fnsContext())
             {
                 var Categories = db.Category;
                 result.AddRange(Categories.Select(r => new SelectListItem

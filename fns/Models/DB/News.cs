@@ -19,6 +19,7 @@ namespace fns.Models.DB
         public int? FocusCount { get; set; }
         public int? Status { get; set; }
         public DateTime? InsDt { get; set; }
+        public int Type { get; set; }
 
         public virtual Category C { get; set; }
     }

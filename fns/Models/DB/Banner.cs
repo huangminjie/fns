@@ -9,5 +9,8 @@ namespace fns.Models.DB
         public string LinkUrl { get; set; }
         public string PicUrl { get; set; }
         public int? Type { get; set; }
+        public int Cid { get; set; }
+
+        public virtual Category C { get; set; }
     }
 }

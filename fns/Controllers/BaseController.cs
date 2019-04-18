@@ -14,7 +14,7 @@ namespace fns.Controllers
 {
     public class BaseController : Controller
     {
-        protected FinancialNewsContext db = new FinancialNewsContext();
+        protected fnsContext db = new fnsContext();
         protected readonly IOptions<AppSettings> settings;
         protected readonly IHostingEnvironment environment;
         public BaseController(IHostingEnvironment environment, IOptions<AppSettings> settings)

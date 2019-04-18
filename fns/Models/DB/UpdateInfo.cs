@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace fns.Models.DB
 {
-    public partial class UpdateInfo
+    public partial class Updateinfo
     {
         public int Id { get; set; }
         public int NewVer { get; set; }

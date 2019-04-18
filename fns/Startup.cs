@@ -39,7 +39,7 @@ namespace fns
                 options.AddPolicy("AllowAllDomain", builder=> builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader().AllowCredentials());
             });
             services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
-            Models.DB.FinancialNewsContext.ConnectionString = Configuration.GetConnectionString("FNSNetCoreEF");
+            Models.DB.fnsContext.ConnectionString = Configuration.GetConnectionString("FNSNetCoreEF");
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options => options.LoginPath = new PathString("/Account/Login"));
 
         }

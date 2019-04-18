@@ -17,7 +17,7 @@ namespace fns.API
     [Route("api/[controller]")]
     public class CategoryController : Controller
     {
-        private FinancialNewsContext db = new FinancialNewsContext();
+        private fnsContext db = new fnsContext();
 
 
         [HttpPost("GetCategories")]

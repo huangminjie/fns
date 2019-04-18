@@ -11,7 +11,7 @@ namespace fns.Utils.API
 {
     public static class APIModelExtentions
     {
-        private static FinancialNewsContext db = new FinancialNewsContext();
+        private static fnsContext db = new fnsContext();
         public static userResponse ToViewModel(this User model, string serverPath)
         {
             userResponse vModel = new userResponse();
