@@ -45,6 +45,10 @@ namespace fns.API
                         var model = await db.News.SingleOrDefaultAsync(n => n.Id == rreq.id);
                         if (model == null)
                             return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该文章！", null, new commParameter("", "")));
+
+                        model.ViewCount = (model.ViewCount ?? 0) + 1;
+                        db.News.Update(model);
+                        db.SaveChanges();
                         news = model.ToViewModel(settings.Value.ServerPath);
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { news = news })), new commParameter(rreq.loginUserId, rreq.transId)));
                     }

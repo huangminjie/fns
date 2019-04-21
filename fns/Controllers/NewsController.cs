@@ -38,8 +38,9 @@ namespace fns.Controllers
             try
             {
                 var item = await db.News.SingleOrDefaultAsync(n => n.Id == id);
-                if (item != null)
+                if (item != null) {
                     return PartialView(item.ToViewModel());
+                }
 
                 return Content("找不到该文章！");
             }
@@ -215,7 +216,8 @@ namespace fns.Controllers
                 if (!string.IsNullOrEmpty(req.id))
                 {
                     var category = await db.Category.SingleOrDefaultAsync(o => o.Id == Convert.ToInt32(req.id));
-                    if (category.News.Count > 0 || category.Banner.Count > 0)
+                    //if (category.News.Count > 0 || category.Banner.Count > 0)
+                    if (db.News.Where(o => o.Cid == category.Id).Count() > 0 || db.Banner.Where(o => o.Cid == category.Id).Count() > 0)
                         return new Response(false, "该类目正被使用，无法删除！");
                     db.Category.Remove(category);
                     await db.SaveChangesAsync();

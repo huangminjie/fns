@@ -263,3 +263,4 @@ __pycache__/
 
 *.DS_Store
 /fns/wwwroot/upload
+/fnspkg

@@ -30,7 +30,7 @@ namespace fns.Controllers
             {
                 if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
                 {
-                    if (db.Admin.Any(u => u.Name == userName))
+                    if (db.Admin.FirstOrDefault(u => u.Name == userName) != null)
                         return JsonConvert.SerializeObject(new Response(false, "用户名已存在！", null));
                     var admin = new Models.DB.Admin()
                     {
