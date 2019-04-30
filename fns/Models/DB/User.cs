@@ -13,5 +13,7 @@ namespace fns.Models.DB
         public int Status { get; set; }
         public DateTime? InsDt { get; set; }
         public DateTime? Birthday { get; set; }
+        public string Collections { get; set; }
+        public string Categories { get; set; }
     }
 }

@@ -108,6 +108,128 @@ namespace fns.API
             }
         }
 
+        [HttpPost("Collection")]
+        public async Task<string> Collection([FromBody] RequestCommon req)
+        {
+            try
+            {
+                if (req != null && req.d != null)
+                {
+                    var reqStr = DESUtil.DecryptCommonParam(req.d);
+                    if (!string.IsNullOrEmpty(reqStr))
+                    {
+                        collectionRequest rreq = JsonConvert.DeserializeObject<collectionRequest>(reqStr);
+                        var uId = 0;
+                        Int32.TryParse(rreq.loginUserId, out uId);
+                        var user = await db.User.SingleOrDefaultAsync(u=>u.Id == uId);
+                        if (user != null)
+                        {
+                            var collections = !string.IsNullOrEmpty(user.Collections) ? JsonConvert.DeserializeObject<List<int>>(user.Collections) : new List<int>();
 
+                            if (collections.Any(c => c == rreq.nId))
+                            {
+                                collections.Remove(rreq.nId);
+                            }
+                            else
+                            {
+                                collections.Add(rreq.nId);
+                            }
+                            user.Collections = JsonConvert.SerializeObject(collections);
+                            db.User.Update(user);
+                            await db.SaveChangesAsync();
+                        }
+                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！",null, new commParameter(rreq.loginUserId, rreq.transId)));
+                    }
+                }
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", ex.Message, null, new commParameter("", "")));
+            }
+        }
+
+        [HttpPost("GetCollections")]
+        public async Task<string> GetCollections([FromBody] RequestCommon req)
+        {
+            try
+            {
+                if (req != null && req.d != null)
+                {
+                    var reqStr = DESUtil.DecryptCommonParam(req.d);
+                    if (!string.IsNullOrEmpty(reqStr))
+                    {
+                        getCollectionRequest rreq = JsonConvert.DeserializeObject<getCollectionRequest>(reqStr);
+
+                        List<int> collections = new List<int>();
+                        var uId = 0;
+                        Int32.TryParse(rreq.loginUserId, out uId);
+                        var user = await db.User.SingleOrDefaultAsync(u => u.Id == uId);
+                        if (user != null)
+                        {
+                            collections = !string.IsNullOrEmpty(user.Collections) ? JsonConvert.DeserializeObject<List<int>>(user.Collections) : new List<int>();
+                        }
+
+                        DateTime dt = DateTime.Now;
+                        List<News> list = new List<News>();
+                        List<newsResponse> newsList = new List<newsResponse>();
+                        News news = await db.News.SingleOrDefaultAsync(o => o.Id == (rreq.id ?? 0));
+                        if (news != null)
+                        {
+                            dt = news.InsDt ?? DateTime.Now;
+                        }
+                        //上拉获取历史数据
+                        if (rreq.op == 0)
+                        {
+                            list = await db.News.Where(n => collections.Contains(n.Id) && n.InsDt < dt).OrderByDescending(o => o.InsDt).Take(rreq.ps).ToListAsync();
+                        }
+                        //下拉获取最新数据
+                        else
+                        {
+                            list = await db.News.Where(n => collections.Contains(n.Id)  && n.InsDt > dt).OrderBy(o => o.InsDt).Take(rreq.ps).OrderByDescending(o => o.InsDt).ToListAsync();
+                        }
+                        list.ForEach(l =>
+                        {
+                            newsList.Add(l.ToViewModel(settings.Value.ServerPath));
+                        });
+                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { newsList = newsList })), new commParameter(rreq.loginUserId, rreq.transId)));
+                    }
+                }
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", ex.Message, null, new commParameter("", "")));
+            }
+        }
+
+        [HttpPost("GetHistoricalRecords")]
+        public string GetHistoricalRecords([FromBody] RequestCommon req)
+        {
+            try
+            {
+                if (req != null && req.d != null)
+                {
+                    var reqStr = DESUtil.DecryptCommonParam(req.d);
+                    if (!string.IsNullOrEmpty(reqStr))
+                    {
+                        getHistoryRequest rreq = JsonConvert.DeserializeObject<getHistoryRequest>(reqStr);
+                        
+                        List<newsResponse> newsList = new List<newsResponse>();
+                        var news = db.News.Where(n => rreq.nIds.Contains(n.Id));
+                        rreq.nIds.ForEach(id=>{
+                            var thisNews = news.SingleOrDefault(n => n.Id == id);
+                            newsList.Add(thisNews.ToViewModel(settings.Value.ServerPath));
+                        });
+                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { newsList })), new commParameter(rreq.loginUserId, rreq.transId)));
+                    }
+                }
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", ex.Message, null, new commParameter("", "")));
+            }
+        }
     }
 }

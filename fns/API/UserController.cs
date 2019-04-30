@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -59,6 +60,11 @@ namespace fns.API
                             if ((await db.User.FirstOrDefaultAsync(u => u.Name == rreq.name)) != null)
                                 return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名已存在！", null, new commParameter(rreq.loginUserId, rreq.transId)));
 
+                            var categories = new List<int>();
+                            await db.Category.ForEachAsync(c => {
+                                categories.Add(c.Id);
+                            });
+
                             var user = new Models.DB.User()
                             {
                                 Name = rreq.name,
@@ -66,8 +72,9 @@ namespace fns.API
                                 InsDt = DateTime.Now,
                                 Gender = 0,//rreq.gender,
                                 //Avatar = rreq.avatar,
-                                Status = (int)UserStatusEnum.Normal
-                            };
+                                Status = (int)UserStatusEnum.Normal,
+                                Categories = JsonConvert.SerializeObject(categories)
+                        };
 
                             //DateTime birthday = DateTime.MinValue;
                             //var isDate = DateTime.TryParse(rreq.birthday, out birthday);
@@ -156,6 +163,39 @@ namespace fns.API
                             return JsonConvert.SerializeObject(new ResponseCommon("0000", "修改成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel(settings.Value.ServerPath) })), new commParameter(ureq.loginUserId, ureq.transId)));
                         }
                         return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该用户！", null, new commParameter(ureq.loginUserId, ureq.transId)));
+                    }
+                }
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", ex.Message, null, new commParameter("", "")));
+            }
+        }
+
+        [HttpPost("UpdateUserCategories")]
+        public async Task<string> UpdateUserCategories([FromBody]RequestCommon req)
+        {
+            try
+            {
+                if (req != null && req.d != null)
+                {
+                    var reqStr = DESUtil.DecryptCommonParam(req.d);
+                    if (!string.IsNullOrEmpty(reqStr))
+                    {
+                        updateCategoriesRequest rreq = JsonConvert.DeserializeObject<updateCategoriesRequest>(reqStr);
+
+                        var uId = 0;
+                        Int32.TryParse(rreq.loginUserId, out uId);
+                        var user = await db.User.SingleOrDefaultAsync(u => u.Id == uId);
+                        if (user != null)
+                        {
+                            user.Categories = JsonConvert.SerializeObject(rreq.cIds);
+                            db.User.Update(user);
+                            await db.SaveChangesAsync();
+                        }
+                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", null, new commParameter(rreq.loginUserId, rreq.transId)));
+
                     }
                 }
                 return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));

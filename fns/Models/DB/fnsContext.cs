@@ -27,7 +27,7 @@ namespace fns.Models.DB
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
-            { 
+            {
                 optionsBuilder.UseMySQL(ConnectionString);
             }
         }
@@ -280,6 +280,14 @@ namespace fns.Models.DB
                     .IsUnicode(false);
 
                 entity.Property(e => e.Birthday).HasColumnName("birthday");
+
+                entity.Property(e => e.Categories)
+                    .HasColumnName("categories")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Collections)
+                    .HasColumnName("collections")
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Gender)
                     .HasColumnName("gender")
