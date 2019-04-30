@@ -14,5 +14,6 @@ namespace fns.Models.API.Response.User
         public int gender { get; set; }
         public int status { get; set; }
         public string birthday { get; set; }
+        public string cids { get; set; }
     }
 }

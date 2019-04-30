@@ -21,6 +21,7 @@ namespace fns.Utils.API
             vModel.gender = model.Gender ?? (int)UserGenderEnum.Unknown;
             vModel.avatar = serverPath + model.Avatar;
             vModel.status = model.Status;
+            vModel.cids = model.Categories;
             return vModel;
         }
         public static newsResponse ToViewModel(this News model, string serverPath)

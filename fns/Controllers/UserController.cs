@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using fns.Models.Admin.VModels;
 using fns.Utils;
 using fns.Models.Admin.Request;
+using Newtonsoft.Json;
 
 namespace fns.Controllers
 {
@@ -78,6 +79,52 @@ namespace fns.Controllers
                 {
                     return new Response(false, "请选择要删除的项");
                 }
+            }
+            catch (Exception ex)
+            {
+                return new Response(false, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<Response> SetCategory([FromBody]SetCategoryRequest req)
+        {
+            try {
+                //var users = await db.User.ToListAsync();
+                //foreach (var item in users)
+                //{
+                //    var cids = item.Categories != null ? JsonConvert.DeserializeObject<List<int>>(item.Categories) : new List<int>();
+                //    var cid = Convert.ToInt32(req.cid);
+                //    if (!cids.Contains(cid))
+                //    {
+                //        cids.Add(cid);
+                //        item.Categories = JsonConvert.SerializeObject(cids);
+                //    }
+                //    await db.SaveChangesAsync();
+                //}
+                return new Response(true);
+            }
+            catch (Exception ex)
+            {
+                return new Response(false, ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<Response> GetCategoryList()
+        {
+            try
+            {
+                var list = new List<Models.Admin.VModels.vCategory>();
+                await db.Category.ForEachAsync(o =>
+                {
+                    list.Add(new vCategory()
+                    {
+                        id = o.Id.ToString(),
+                        name = o.Name
+                    });
+                });
+                return new Response(true, "", list);
             }
             catch (Exception ex)
             {

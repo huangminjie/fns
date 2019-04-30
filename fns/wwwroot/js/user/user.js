@@ -78,3 +78,51 @@ function remove(id){
         })
     }
 }
+function openModal() {
+    $.ajax({
+        url: '/User/GetCategoryList',
+        type: 'GET',
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        success: function (data, status) {
+            if (data.ok) {
+                $("#cid").empty();
+                if (Array.isArray(data.resData) && data.resData.length > 0) {
+                    data.resData.forEach(c => {
+                        $("#cid").append('<option value= "' + c.id + '" > ' + c.name + '</option>');
+                    });
+                }
+            }
+            else {
+                alert(data.message);
+            }
+        }
+    });
+    $('#myModal').modal('show');
+}
+function save() {
+    var cid = $("#cid").val();
+    if (cid === '') {
+        alert("请选择类目!");
+        return false;
+    }
+    var data = {
+        cid: parseInt(cid)
+    };
+    $.ajax({
+        url: '/User/SetCategory',
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
+        success: function (data, status) {
+            if (data.ok) {
+                search();
+                $('#myModal').modal('hide');
+            }
+            else {
+                alert(data.message);
+            }
+        }
+    })
+}

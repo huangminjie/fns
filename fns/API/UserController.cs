@@ -29,9 +29,9 @@ namespace fns.API
         [HttpGet("{id}")]
         public string Get(int id)
         {
+            #region MyRegion
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "1", transId = "sdfsd", cid = 9 }));
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "1", transId = "sdfsd", cid = 2, ps = 15, op = 0, id = 0 }));
-            return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "1", transId = "sdfsd", id = 270 }));
             //return DESUtil.DecryptCommonParam("Kinv8nJpClfbtu2i6lajWjv7OzcJ1k0mvbR4qRli4jsw1uWvG6hZBTU5BTQ+x/cXWBXlSebQGj/i6+JdSGuqV6yor8elj9hOT4OvOnIGbI78qho+i97xguh4zZEEusGq4viCXED5rLF/cDAl1BzRZGfWXpVtLFoZxpp4tAcjp97U5CXWSaEPkraMroflYSc3mktSdQWkTMtGBhGwML1wE7QjoHd+rN7rTm2RGgTL9n0Ot1UcDncK0UbsdVVyxCxkx1Io7Ojk1lKl9GVrOcg5wNbR2fYahtfhQusKGdC+QddKW9rUjzU/12oobUYRlee1cjMu3u7bogrAZ9nnlENUYzFzAz6iUWMM");
             //register
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { name = "test0421", password = "123456", loginUserId = "1", transId = "sdfsd" }));
@@ -40,7 +40,15 @@ namespace fns.API
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { name = "test", password = "123456", gender= "1", avatar = "", loginUserId = "1", transId = "sdfsd" }));
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { id = 9, name = "tttt1", password = "123456", avatar="sdf", birthday ="2019-5-5", loginUserId = "1", transId = "sdfsd" }));
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { id = 3, name = "test1", gender = 2, password = "123456", loginUserId = "1", transId = "sdfsd" }));
-            //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { id = 3, name = "test1", gender = 2, password = "123456", loginUserId = "1", transId = "sdfsd" }));
+            //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { id = 3, name = "test1", gender = 2, password = "123456", loginUserId = "1", transId = "sdfsd" })); 
+            #endregion
+            var req = new
+            {
+                loginUserId = id,
+                transId = "test",
+                nids = new List<int>() { 199,202,216 }
+            };
+            return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(req));
         }
 
         // POST api/values
@@ -195,7 +203,6 @@ namespace fns.API
                             await db.SaveChangesAsync();
                         }
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", null, new commParameter(rreq.loginUserId, rreq.transId)));
-
                     }
                 }
                 return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));
