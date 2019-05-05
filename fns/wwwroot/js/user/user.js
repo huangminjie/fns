@@ -23,8 +23,8 @@ function search(index) {
                         </td>
                         <td>${item.gender}</td>
                         <td>${item.status}</td>
-                        <td>${item.insDt}</td>
                         <td>${item.birthday}</td>
+                        <td>${item.insDt}</td>
                         <td style="display: flex;">
                             <a href="javascript:void(0);" onclick="remove(${item.id})"><i class="fa fa-remove fa-fw"></i></a>
                         </td>
@@ -32,8 +32,8 @@ function search(index) {
                     `;
                     $("tbody").append(tr);
                 });
-                if(data.resData.total > 0){
-                    if(index === 0){
+                if (data.resData.total > 0) {
+                    if (index === 0) {
                         $('#paginationUserList.pagination').jqPaginator({
                             totalCounts: data.resData.total,
                             pageSize: data.resData.ps,
@@ -43,7 +43,7 @@ function search(index) {
                             }
                         });
                     }
-                    else{
+                    else {
                         $('#paginationUserList.pagination').jqPaginator('option', {
                             currentPage: index
                         });
@@ -54,7 +54,7 @@ function search(index) {
                 alert(data.message);
             }
         }
-    })
+    });
 }
 function remove(id){
     var r = confirm("确认删除?");
@@ -117,7 +117,7 @@ function save() {
         data: JSON.stringify(data),
         success: function (data, status) {
             if (data.ok) {
-                search();
+                search(0);
                 $('#myModal').modal('hide');
             }
             else {

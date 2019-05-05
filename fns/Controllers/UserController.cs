@@ -89,19 +89,19 @@ namespace fns.Controllers
         [HttpPost]
         public async Task<Response> SetCategory([FromBody]SetCategoryRequest req)
         {
-            try {
-                //var users = await db.User.ToListAsync();
-                //foreach (var item in users)
-                //{
-                //    var cids = item.Categories != null ? JsonConvert.DeserializeObject<List<int>>(item.Categories) : new List<int>();
-                //    var cid = Convert.ToInt32(req.cid);
-                //    if (!cids.Contains(cid))
-                //    {
-                //        cids.Add(cid);
-                //        item.Categories = JsonConvert.SerializeObject(cids);
-                //    }
-                //    await db.SaveChangesAsync();
-                //}
+            try
+            {
+                var cid = Convert.ToInt32(req.cid);
+                await db.User.ForEachAsync((item)=>{
+                    var cids = item.Categories != null ? JsonConvert.DeserializeObject<List<int>>(item.Categories) : new List<int>();
+                    if (!cids.Contains(cid))
+                    {
+                        cids.Add(cid);
+                        item.Categories = JsonConvert.SerializeObject(cids);
+                    }
+                    db.User.Update(item);
+                });
+                await db.SaveChangesAsync();
                 return new Response(true);
             }
             catch (Exception ex)
