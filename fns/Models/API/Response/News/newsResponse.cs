@@ -24,5 +24,6 @@ namespace fns.Models.API.Response.News
         public int focusCount { get; set; }
         public int status { get; set; }
         public string insDt { get; set; }
+        public bool isCollection { get; set; }
     }
 }

@@ -49,7 +49,7 @@ namespace fns.API
                         model.ViewCount = (model.ViewCount ?? 0) + 1;
                         db.News.Update(model);
                         db.SaveChanges();
-                        news = model.ToViewModel(settings.Value.ServerPath);
+                        news = model.ToViewModel(settings.Value.ServerPath,rreq.loginUserId);
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { news = news })), new commParameter(rreq.loginUserId, rreq.transId)));
                     }
                 }

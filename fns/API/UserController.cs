@@ -46,7 +46,7 @@ namespace fns.API
             {
                 loginUserId = id,
                 transId = "test",
-                nids = new List<int>() { 199,202,216 }
+                id = 139
             };
             return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(req));
         }
