@@ -30,9 +30,9 @@ namespace fns.API
         public string Get(int id)
         {
             #region MyRegion
-            //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "1", transId = "sdfsd", cid = 9 }));
-            //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "1", transId = "sdfsd", cid = 2, ps = 15, op = 0, id = 0 }));
-            //return DESUtil.DecryptCommonParam("Kinv8nJpClfbtu2i6lajWjv7OzcJ1k0mvbR4qRli4jsw1uWvG6hZBTU5BTQ+x/cXWBXlSebQGj/i6+JdSGuqV6yor8elj9hOT4OvOnIGbI78qho+i97xguh4zZEEusGq4viCXED5rLF/cDAl1BzRZGfWXpVtLFoZxpp4tAcjp97U5CXWSaEPkraMroflYSc3mktSdQWkTMtGBhGwML1wE7QjoHd+rN7rTm2RGgTL9n0Ot1UcDncK0UbsdVVyxCxkx1Io7Ojk1lKl9GVrOcg5wNbR2fYahtfhQusKGdC+QddKW9rUjzU/12oobUYRlee1cjMu3u7bogrAZ9nnlENUYzFzAz6iUWMM");
+            //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "3", transId = "sdfsd", id = 29 }));
+            //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "3", transId = "sdfsd", ps = 15, op = 0, id = 29 }));
+            //return DESUtil.DecryptCommonParam("zL12nTPj7Ez2GJCL9v0LHqC2tuLHLO0v5x7IGHym1aTYIXWGI8HjhBLJ72OBqtUXgOt3DXjDbBcGu4TmnrqS0dsqNiYaNW5vR00ctHy9jO8qMUG/QMpqkeHbIYLvYHwSdsyN6/wOZJGwdKHzerSusOpbbTlwYsTVKQ5btye+A5K+xnkr0NXW9hM4PoWjp+h3S72AEa+21MNOXsL/pnTt/JvKMF2a3eHgJrPl93chjJ3Xnv2eWiHzXPdwPhouGYGFSXXEjhbm5+IFIZx2YnuIfiM+Xpd9OTfzcaebtXMAsU1ZacGiNfiOeDLDzYWlpoXRF6FTZRNOiVGRKmJXbAlsO1h7+7CUr8uwe6KTTaa3DRyG5a6CmD5dSh4pQJqszL3SxDIb+PbKL0houcyUVq7YNsYWIR/S1GfW9ZjX0OJl0zOVPIkgvjaP/rXH16ggX0DC42O7wMkE1f9hFXQugMwWUg==");
             //register
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { name = "test0421", password = "123456", loginUserId = "1", transId = "sdfsd" }));
             //{d:"8GnI5XCorxsAY4vJqy6JkM6SA5K5ARyCXA8EMksTLEjbdC/x3RyGlRJNd4OJ9Z1OqF7lfqZwLxdqiPQb37l8Q0/HEBWF9igC6U9gQQTPFPM="}
@@ -46,7 +46,7 @@ namespace fns.API
             {
                 loginUserId = id,
                 transId = "test",
-                id = 139
+                isAttentioned = true
             };
             return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(req));
         }

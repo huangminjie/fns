@@ -49,7 +49,27 @@ namespace fns.API
                         model.ViewCount = (model.ViewCount ?? 0) + 1;
                         db.News.Update(model);
                         db.SaveChanges();
-                        news = model.ToViewModel(settings.Value.ServerPath,rreq.loginUserId);
+                        news = model.ToViewModel(settings.Value.ServerPath);
+                        #region 获取category name
+                        if (string.IsNullOrEmpty(news.cName))
+                        {
+                            news.cName = db.Category.SingleOrDefault(o => o.Id == model.Cid)?.Name;
+                        }
+                        #endregion
+
+                        #region 判断是否被用户收藏
+                        news.isCollection = false;
+                        Int32.TryParse(rreq.loginUserId, out int uId);
+                        var user = db.User.SingleOrDefault(u => u.Id == uId);
+                        if (user != null)
+                        {
+                            var collections = !string.IsNullOrEmpty(user.Collections) ? JsonConvert.DeserializeObject<List<int>>(user.Collections) : new List<int>();
+                            if (collections.Contains(model.Id))
+                            {
+                                news.isCollection = true;
+                            }
+                        }
+                        #endregion
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { news = news })), new commParameter(rreq.loginUserId, rreq.transId)));
                     }
                 }
@@ -93,9 +113,17 @@ namespace fns.API
                         {
                             list = await db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title) && n.Cid == rreq.cid && n.InsDt > dt).OrderBy(o => o.InsDt).Take(rreq.ps).OrderByDescending(o => o.InsDt).ToListAsync();
                         }
+                        var categories = db.Category.ToList();
                         list.ForEach(l =>
                         {
-                            newsList.Add(l.ToViewModel(settings.Value.ServerPath));
+                            var vNews = l.ToViewModel(settings.Value.ServerPath);
+                            #region 获取category name
+                            if (string.IsNullOrEmpty(vNews.cName))
+                            {
+                                vNews.cName = categories.SingleOrDefault(o => o.Id == vNews.cid)?.Name;
+                            }
+                            #endregion
+                            newsList.Add(vNews);
                         });
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { newsList = newsList })), new commParameter(rreq.loginUserId, rreq.transId)));
                     }
@@ -122,6 +150,8 @@ namespace fns.API
                         var uId = 0;
                         Int32.TryParse(rreq.loginUserId, out uId);
                         var user = await db.User.SingleOrDefaultAsync(u=>u.Id == uId);
+                        var returnMsg = "";
+                        var returnCode = "0000";
                         if (user != null)
                         {
                             var collections = !string.IsNullOrEmpty(user.Collections) ? JsonConvert.DeserializeObject<List<int>>(user.Collections) : new List<int>();
@@ -129,16 +159,23 @@ namespace fns.API
                             if (collections.Any(c => c == rreq.nId))
                             {
                                 collections.Remove(rreq.nId);
+                                returnMsg = "取消收藏！";
                             }
                             else
                             {
                                 collections.Add(rreq.nId);
+                                returnMsg = "收藏成功！";
                             }
                             user.Collections = JsonConvert.SerializeObject(collections);
                             db.User.Update(user);
                             await db.SaveChangesAsync();
                         }
-                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！",null, new commParameter(rreq.loginUserId, rreq.transId)));
+                        else
+                        {
+                            returnMsg = "请先登录！";
+                            returnCode = "0002";
+                        }
+                        return JsonConvert.SerializeObject(new ResponseCommon(returnCode, returnMsg, null, new commParameter(rreq.loginUserId, rreq.transId)));
                     }
                 }
                 return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));
@@ -188,9 +225,17 @@ namespace fns.API
                         {
                             list = await db.News.Where(n => collections.Contains(n.Id)  && n.InsDt > dt).OrderBy(o => o.InsDt).Take(rreq.ps).OrderByDescending(o => o.InsDt).ToListAsync();
                         }
+                        var categories = db.Category.ToList();
                         list.ForEach(l =>
                         {
-                            newsList.Add(l.ToViewModel(settings.Value.ServerPath));
+                            var vNews = l.ToViewModel(settings.Value.ServerPath);
+                            #region 获取category name
+                            if (string.IsNullOrEmpty(vNews.cName))
+                            {
+                                vNews.cName = categories.SingleOrDefault(o => o.Id == vNews.cid)?.Name;
+                            }
+                            #endregion
+                            newsList.Add(vNews);
                         });
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { newsList = newsList })), new commParameter(rreq.loginUserId, rreq.transId)));
                     }
@@ -217,9 +262,20 @@ namespace fns.API
                         
                         List<newsResponse> newsList = new List<newsResponse>();
                         var news = db.News.Where(n => rreq.nIds.Contains(n.Id));
+                        var categories = db.Category.ToList();
                         rreq.nIds.ForEach(id=>{
                             var thisNews = news.SingleOrDefault(n => n.Id == id);
-                            newsList.Add(thisNews.ToViewModel(settings.Value.ServerPath));
+                            if (thisNews != null)
+                            {
+                                var vNews = thisNews.ToViewModel(settings.Value.ServerPath);
+                                #region 获取category name
+                                if (string.IsNullOrEmpty(vNews.cName))
+                                {
+                                    vNews.cName = categories.SingleOrDefault(o => o.Id == vNews.cid)?.Name;
+                                }
+                                #endregion
+                                newsList.Add(vNews);
+                            }
                         });
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { newsList })), new commParameter(rreq.loginUserId, rreq.transId)));
                     }
