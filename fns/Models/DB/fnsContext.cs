@@ -19,6 +19,7 @@ namespace fns.Models.DB
         public virtual DbSet<Admin> Admin { get; set; }
         public virtual DbSet<Banner> Banner { get; set; }
         public virtual DbSet<Category> Category { get; set; }
+        public virtual DbSet<Comment> Comment { get; set; }
         public virtual DbSet<News> News { get; set; }
         public virtual DbSet<Splash> Splash { get; set; }
         public virtual DbSet<Updateinfo> Updateinfo { get; set; }
@@ -34,7 +35,7 @@ namespace fns.Models.DB
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasAnnotation("ProductVersion", "2.2.4-servicing-10062");
+            modelBuilder.HasAnnotation("ProductVersion", "2.2.0-rtm-35687");
 
             modelBuilder.Entity<Admin>(entity =>
             {
@@ -123,6 +124,52 @@ namespace fns.Models.DB
                     .HasColumnName("name")
                     .HasMaxLength(50)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<Comment>(entity =>
+            {
+                entity.ToTable("comment", "fns");
+
+                entity.HasIndex(e => e.NId)
+                    .HasName("FK_CommentToNews");
+
+                entity.HasIndex(e => e.UId)
+                    .HasName("FK_CommentToUser");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.Content)
+                    .IsRequired()
+                    .HasColumnName("content")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.InsDt).HasColumnName("insDT");
+
+                entity.Property(e => e.NId)
+                    .HasColumnName("nId")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.Status)
+                    .HasColumnName("status")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.UId)
+                    .HasColumnName("uId")
+                    .HasColumnType("int(11)");
+
+                entity.HasOne(d => d.N)
+                    .WithMany(p => p.Comment)
+                    .HasForeignKey(d => d.NId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CommentToNews");
+
+                entity.HasOne(d => d.U)
+                    .WithMany(p => p.Comment)
+                    .HasForeignKey(d => d.UId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CommentToUser");
             });
 
             modelBuilder.Entity<News>(entity =>

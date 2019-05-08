@@ -43,4 +43,9 @@ namespace fns.Utils
     {
         Normal = 0 //正常
     }
+    public enum CommentStatusEnum
+    {
+        Normal = 0, //正常
+        Illegal = 1, //违规
+    }
 }

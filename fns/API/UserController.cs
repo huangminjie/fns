@@ -31,7 +31,7 @@ namespace fns.API
         {
             #region MyRegion
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "3", transId = "sdfsd", id = 29 }));
-            //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "3", transId = "sdfsd", ps = 15, op = 0, id = 29 }));
+            return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "3", transId = "sdfsd", ps = 15, op = 0, nids = new List<int>() { 29,39} }));
             //return DESUtil.DecryptCommonParam("zL12nTPj7Ez2GJCL9v0LHqC2tuLHLO0v5x7IGHym1aTYIXWGI8HjhBLJ72OBqtUXgOt3DXjDbBcGu4TmnrqS0dsqNiYaNW5vR00ctHy9jO8qMUG/QMpqkeHbIYLvYHwSdsyN6/wOZJGwdKHzerSusOpbbTlwYsTVKQ5btye+A5K+xnkr0NXW9hM4PoWjp+h3S72AEa+21MNOXsL/pnTt/JvKMF2a3eHgJrPl93chjJ3Xnv2eWiHzXPdwPhouGYGFSXXEjhbm5+IFIZx2YnuIfiM+Xpd9OTfzcaebtXMAsU1ZacGiNfiOeDLDzYWlpoXRF6FTZRNOiVGRKmJXbAlsO1h7+7CUr8uwe6KTTaa3DRyG5a6CmD5dSh4pQJqszL3SxDIb+PbKL0houcyUVq7YNsYWIR/S1GfW9ZjX0OJl0zOVPIkgvjaP/rXH16ggX0DC42O7wMkE1f9hFXQugMwWUg==");
             //register
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { name = "test0421", password = "123456", loginUserId = "1", transId = "sdfsd" }));
@@ -46,7 +46,7 @@ namespace fns.API
             {
                 loginUserId = id,
                 transId = "test",
-                isAttentioned = true
+                id= 39
             };
             return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(req));
         }

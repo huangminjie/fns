@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using fns.Models.DB;
 
 namespace fns.Models.API.Response.News
 {
@@ -25,5 +26,15 @@ namespace fns.Models.API.Response.News
         public int status { get; set; }
         public string insDt { get; set; }
         public bool isCollection { get; set; }
+        public List<CommentResponse> comments { get; set; }
+    }
+    public class CommentResponse
+    {
+        public int id { get; set; }
+        public int nId { get; set; }
+        public int uId { get; set; }
+        public string content { get; set;}
+        public string insDT { get; set; }
+        public int status { get; set; }
     }
 }

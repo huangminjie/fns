@@ -31,7 +31,7 @@ namespace fns.Utils.API
             vModel.id = model.Id;
             vModel.title = model.Title;
             ///news/detail 网站的新闻页面
-            vModel.contentRef = !string.IsNullOrEmpty(model.Content)?serverPath +"/news/detail/" +model.Id : ""; // the reference link of the custom news
+            vModel.contentRef = !string.IsNullOrEmpty(model.Content) ? serverPath + "/news/detail/" + model.Id : ""; // the reference link of the custom news
             vModel.doRef = model.DoRef;
             vModel.cid = model.Cid;
             if (model.C != null)
@@ -61,6 +61,18 @@ namespace fns.Utils.API
             vModel.focusCount = model.FocusCount ?? 0;
             vModel.status = model.Status ?? 0;
             vModel.insDt = model.InsDt.ToDate();
+            return vModel;
+        }
+        public static CommentResponse ToViewModel(this Comment model)
+        {
+            CommentResponse vModel = new CommentResponse() {
+                id = model.Id,
+                nId = model.NId,
+                uId = model.UId,
+                content = model.Content,
+                status = model.Status,
+                insDT= model.InsDt.ToDate()
+            };
             return vModel;
         }
     }

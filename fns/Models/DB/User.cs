@@ -5,6 +5,11 @@ namespace fns.Models.DB
 {
     public partial class User
     {
+        public User()
+        {
+            Comment = new HashSet<Comment>();
+        }
+
         public int Id { get; set; }
         public string Name { get; set; }
         public string Password { get; set; }
@@ -15,5 +20,7 @@ namespace fns.Models.DB
         public DateTime? Birthday { get; set; }
         public string Collections { get; set; }
         public string Categories { get; set; }
+
+        public virtual ICollection<Comment> Comment { get; set; }
     }
 }

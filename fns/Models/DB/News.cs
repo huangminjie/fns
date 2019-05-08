@@ -5,6 +5,11 @@ namespace fns.Models.DB
 {
     public partial class News
     {
+        public News()
+        {
+            Comment = new HashSet<Comment>();
+        }
+
         public int Id { get; set; }
         public int Cid { get; set; }
         public string Title { get; set; }
@@ -22,5 +27,6 @@ namespace fns.Models.DB
         public int Type { get; set; }
 
         public virtual Category C { get; set; }
+        public virtual ICollection<Comment> Comment { get; set; }
     }
 }
