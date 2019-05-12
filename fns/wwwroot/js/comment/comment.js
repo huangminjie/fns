@@ -7,7 +7,7 @@ function search(index) {
         ps: 10
     };
     $.ajax({
-        url: '/User/GetList',
+        url: '/Comment/GetList',
         type: 'GET',
         data: data,
         success: function (data, status) {
@@ -17,16 +17,13 @@ function search(index) {
                     var tr = `
                     <tr>
                         <td>${item.id}</td>
-                        <td>${item.name}</td>
-                        <td>
-                            <img src="${item.avatar}" style="height: 60px;width: 60px;" />
-                        </td>
-                        <td>${item.gender}</td>
+                        <td>${item.user}</td>
+                        <td>${item.news}</td>
+                        <td>${item.content}</td>
                         <td>${item.status}</td>
-                        <td>${item.birthday}</td>
                         <td>${item.insDt}</td>
                         <td style="display: flex;">
-                            <a href="javascript:void(0);" onclick="remove(${item.id})"><i class="fa fa-remove fa-fw"></i></a>
+                            <a href="javascript:void(0);" onclick="changeStatus(${item.id},'${item.status}')">变更状态</a>
                         </td>
                     </tr>
                     `;
@@ -56,73 +53,37 @@ function search(index) {
         }
     });
 }
-function remove(id){
-    var r = confirm("确认删除?");
-    if (r == true) {
+function changeStatus(id,status) {
+    var text = "";
+    var isNormal = true;
+    if (status === "正常") {
+        text = "确认标记该评论为违规？";
+        isNormal = false;
+    }
+    else {
+        text = "确认标记该评论为正常？";
+        isNormal = true;
+    }
+    var r = confirm(text);
+    if (r === true) {
         $.ajax({
-            url: '/User/Delete',
+            url: '/Comment/Audit',
             type: 'POST',
             dataType: 'json',
             contentType: 'application/json; charset=utf-8',
             data: JSON.stringify({
-                id:id
+                id: id,
+                isNormal: isNormal
             }),
             success: function (data, status) {
                 if (data.ok) {
+                    alert("操作成功！");
                     search(1);
                 }
                 else {
                     alert(data.message);
                 }
             }
-        })
+        });
     }
-}
-function openModal() {
-    $.ajax({
-        url: '/User/GetCategoryList',
-        type: 'GET',
-        dataType: 'json',
-        contentType: 'application/json; charset=utf-8',
-        success: function (data, status) {
-            if (data.ok) {
-                $("#cid").empty();
-                if (Array.isArray(data.resData) && data.resData.length > 0) {
-                    data.resData.forEach(c => {
-                        $("#cid").append('<option value= "' + c.id + '" > ' + c.name + '</option>');
-                    });
-                }
-            }
-            else {
-                alert(data.message);
-            }
-        }
-    });
-    $('#myModal').modal('show');
-}
-function save() {
-    var cid = $("#cid").val();
-    if (cid === '') {
-        alert("请选择类目!");
-        return false;
-    }
-    var data = {
-        cid: parseInt(cid)
-    };
-    $.ajax({
-        url: '/User/SetCategory',
-        type: 'POST',
-        dataType: 'json',
-        contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify(data),
-        success: function (data, status) {
-            if (data.ok) {
-                search(0);
-                $('#myModal').modal('hide');
-            }
-            else {
-                alert(data.message);
-            }
-        }
-    })
 }

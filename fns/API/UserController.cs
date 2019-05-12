@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -39,8 +40,8 @@ namespace fns.API
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { name = "test0421", password = "123456", loginUserId = "1", transId = "sdfsd" }));
             //{d:"8GnI5XCorxsAY4vJqy6JkM6SA5K5ARyCXA8EMksTLEjbdC/x3RyGlRJNd4OJ9Z1OqF7lfqZwLxdqiPQb37l8Q0/HEBWF9igC6U9gQQTPFPM="}
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new {  loginUserId = "1", transId = "sdfsd" }));
-            //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { name = "test", password = "123456", gender= "1", avatar = "", loginUserId = "1", transId = "sdfsd" }));
-            //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { id = 9, name = "tttt1", password = "123456", avatar="sdf", birthday ="2019-5-5", loginUserId = "1", transId = "sdfsd" }));
+            return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { name = "test05131", password = "123456", gender = "1", avatar = "", loginUserId = "1", transId = "sdfsd" }));
+            return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { id = 9, name = "tttt1", password = "123456", avatar="sdf", birthday ="2019-5-5", loginUserId = "1", transId = "sdfsd" }));
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { id = 3, name = "test1", gender = 2, password = "123456", loginUserId = "1", transId = "sdfsd" }));
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { id = 3, name = "test1", gender = 2, password = "123456", loginUserId = "1", transId = "sdfsd" })); 
             #endregion
@@ -74,7 +75,9 @@ namespace fns.API
                                     return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名已存在！", null, new commParameter(rreq.loginUserId, rreq.transId)));
 
                                 var categories = new List<int>();
-                                await db.Category.ForEachAsync(c => {
+                                var cCount = await db.Category.CountAsync();
+                                var ps = cCount >= 4 ? 4 : cCount;
+                                await db.Category.Take(ps).ForEachAsync(c => {
                                     categories.Add(c.Id);
                                 });
 
