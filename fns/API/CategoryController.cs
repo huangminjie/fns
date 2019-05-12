@@ -67,7 +67,7 @@ namespace fns.API
                                 }
                                 else
                                 {
-                                    res = list;
+                                    res = list.Take(4).ToList();
                                 }
                             }
                         }
