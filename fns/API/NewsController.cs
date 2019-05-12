@@ -42,40 +42,44 @@ namespace fns.API
                     {
                         newsRequest rreq = JsonConvert.DeserializeObject<newsRequest>(reqStr);
                         newsResponse news = new newsResponse();
-                        var model = await db.News.SingleOrDefaultAsync(n => n.Id == rreq.id);
-                        if (model == null)
-                            return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该文章！", null, new commParameter("", "")));
 
-                        model.ViewCount = (model.ViewCount ?? 0) + 1;
-                        db.News.Update(model);
-                        db.SaveChanges();
-                        news = model.ToViewModel(settings.Value.ServerPath);
-                        #region 获取category name
-                        if (string.IsNullOrEmpty(news.cName))
+                        using (fnsContext db = new fnsContext())
                         {
-                            news.cName = db.Category.SingleOrDefault(o => o.Id == model.Cid)?.Name;
-                        }
-                        #endregion
+                            var model = await db.News.SingleOrDefaultAsync(n => n.Id == rreq.id);
+                            if (model == null)
+                                return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该文章！", null, new commParameter("", "")));
 
-                        #region 判断是否被用户收藏
-                        news.isCollection = false;
-                        Int32.TryParse(rreq.loginUserId, out int uId);
-                        var user = db.User.SingleOrDefault(u => u.Id == uId);
-                        if (user != null)
-                        {
-                            var collections = !string.IsNullOrEmpty(user.Collections) ? JsonConvert.DeserializeObject<List<int>>(user.Collections) : new List<int>();
-                            if (collections.Contains(model.Id))
+                            model.ViewCount = (model.ViewCount ?? 0) + 1;
+                            db.News.Update(model);
+                            await db.SaveChangesAsync();
+                            news = model.ToViewModel(settings.Value.ServerPath);
+                            #region 获取category name
+                            if (string.IsNullOrEmpty(news.cName))
                             {
-                                news.isCollection = true;
+                                news.cName = db.Category.SingleOrDefault(o => o.Id == model.Cid)?.Name;
                             }
-                        }
-                        #endregion
+                            #endregion
 
-                        #region 获取正常评论
-                        var comments = db.Comment.Where(c => c.NId == news.id && c.Status != (int)CommentStatusEnum.Illegal).Select(o=>o.ToViewModel()).ToList();
-                        news.comments= new List<CommentResponse>();
-                        news.comments.AddRange(comments);
-                        #endregion
+                            #region 判断是否被用户收藏
+                            news.isCollection = false;
+                            Int32.TryParse(rreq.loginUserId, out int uId);
+                            var user = db.User.SingleOrDefault(u => u.Id == uId);
+                            if (user != null)
+                            {
+                                var collections = !string.IsNullOrEmpty(user.Collections) ? JsonConvert.DeserializeObject<List<int>>(user.Collections) : new List<int>();
+                                if (collections.Contains(model.Id))
+                                {
+                                    news.isCollection = true;
+                                }
+                            }
+                            #endregion
+
+                            //#region 获取正常评论
+                            //var comments = db.Comment.Where(c => c.NId == news.id && c.Status != (int)CommentStatusEnum.Illegal).Select(o=>o.ToViewModel()).ToList();
+                            //news.comments= new List<CommentResponse>();
+                            //news.comments.AddRange(comments);
+                            //#endregion
+                        }
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { news = news })), new commParameter(rreq.loginUserId, rreq.transId)));
                     }
                 }
@@ -102,41 +106,44 @@ namespace fns.API
                         DateTime dt = DateTime.Now;
                         List<News> list = new List<News>();
                         List<newsResponse> newsList = new List<newsResponse>();
-                        News news = await db.News.SingleOrDefaultAsync(o => o.Id == (rreq.id ?? 0));
-                        if (news != null)
+                        using (fnsContext db = new fnsContext())
                         {
-                            dt = news.InsDt ?? DateTime.Now;
-                        }
-                        rreq.title = string.IsNullOrEmpty(rreq.title) ? "" : rreq.title;
-                        rreq.auth = string.IsNullOrEmpty(rreq.auth) ? "" : rreq.auth;
-                        //上拉获取历史数据
-                        if (rreq.op == 0)
-                        {
-                            list = await db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title) && n.Cid == rreq.cid && n.InsDt < dt).OrderByDescending(o => o.InsDt).Take(rreq.ps).ToListAsync();
-                        }
-                        //下拉获取最新数据
-                        else
-                        {
-                            list = await db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title) && n.Cid == rreq.cid && n.InsDt > dt).OrderBy(o => o.InsDt).Take(rreq.ps).OrderByDescending(o => o.InsDt).ToListAsync();
-                        }
-                        var categories = db.Category.ToList();
-                        var comments = db.Comment.Where(c => c.Status != (int)CommentStatusEnum.Illegal).ToList();
-                        list.ForEach(l =>
-                        {
-                            var vNews = l.ToViewModel(settings.Value.ServerPath);
+                            News news = await db.News.SingleOrDefaultAsync(o => o.Id == (rreq.id ?? 0));
+                            if (news != null)
+                            {
+                                dt = news.InsDt ?? DateTime.Now;
+                            }
+                            rreq.title = string.IsNullOrEmpty(rreq.title) ? "" : rreq.title;
+                            rreq.auth = string.IsNullOrEmpty(rreq.auth) ? "" : rreq.auth;
+                            //上拉获取历史数据
+                            if (rreq.op == 0)
+                            {
+                                list = await db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title) && n.Cid == rreq.cid && n.InsDt < dt).OrderByDescending(o => o.InsDt).Take(rreq.ps).ToListAsync();
+                            }
+                            //下拉获取最新数据
+                            else
+                            {
+                                list = await db.News.Where(n => n.Auth.Contains(rreq.auth) && n.Title.Contains(rreq.title) && n.Cid == rreq.cid && n.InsDt > dt).OrderBy(o => o.InsDt).Take(rreq.ps).OrderByDescending(o => o.InsDt).ToListAsync();
+                            }
+                            var categories = db.Category.ToList();
+                            //var comments = db.Comment.Where(c => c.Status != (int)CommentStatusEnum.Illegal).ToList();
+                            list.ForEach(l =>
+                            {
+                                var vNews = l.ToViewModel(settings.Value.ServerPath);
                             #region 获取category name
                             if (string.IsNullOrEmpty(vNews.cName))
-                            {
-                                vNews.cName = categories.SingleOrDefault(o => o.Id == vNews.cid)?.Name;
-                            }
+                                {
+                                    vNews.cName = categories.SingleOrDefault(o => o.Id == vNews.cid)?.Name;
+                                }
                             #endregion
 
-                            #region 获取正常评论
-                            vNews.comments = new List<CommentResponse>();
-                            vNews.comments.AddRange(comments.Where(c => c.NId == vNews.id).Select(o=> o.ToViewModel()).ToList());
-                            #endregion
+                            //#region 获取正常评论
+                            //vNews.comments = new List<CommentResponse>();
+                            //vNews.comments.AddRange(comments.Where(c => c.NId == vNews.id).Select(o=> o.ToViewModel()).ToList());
+                            //#endregion
                             newsList.Add(vNews);
-                        });
+                            });
+                        }
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { newsList = newsList })), new commParameter(rreq.loginUserId, rreq.transId)));
                     }
                 }
@@ -161,31 +168,34 @@ namespace fns.API
                         collectionRequest rreq = JsonConvert.DeserializeObject<collectionRequest>(reqStr);
                         var uId = 0;
                         Int32.TryParse(rreq.loginUserId, out uId);
-                        var user = await db.User.SingleOrDefaultAsync(u=>u.Id == uId);
                         var returnMsg = "";
                         var returnCode = "0000";
-                        if (user != null)
+                        using (fnsContext db= new fnsContext())
                         {
-                            var collections = !string.IsNullOrEmpty(user.Collections) ? JsonConvert.DeserializeObject<List<int>>(user.Collections) : new List<int>();
-
-                            if (collections.Any(c => c == rreq.nId))
+                            var user = await db.User.SingleOrDefaultAsync(u => u.Id == uId);
+                            if (user != null)
                             {
-                                collections.Remove(rreq.nId);
-                                returnMsg = "取消收藏！";
+                                var collections = !string.IsNullOrEmpty(user.Collections) ? JsonConvert.DeserializeObject<List<int>>(user.Collections) : new List<int>();
+
+                                if (collections.Any(c => c == rreq.nId))
+                                {
+                                    collections.Remove(rreq.nId);
+                                    returnMsg = "取消收藏！";
+                                }
+                                else
+                                {
+                                    collections.Add(rreq.nId);
+                                    returnMsg = "收藏成功！";
+                                }
+                                user.Collections = JsonConvert.SerializeObject(collections);
+                                db.User.Update(user);
+                                await db.SaveChangesAsync();
                             }
                             else
                             {
-                                collections.Add(rreq.nId);
-                                returnMsg = "收藏成功！";
+                                returnMsg = "请先登录！";
+                                returnCode = "0002";
                             }
-                            user.Collections = JsonConvert.SerializeObject(collections);
-                            db.User.Update(user);
-                            await db.SaveChangesAsync();
-                        }
-                        else
-                        {
-                            returnMsg = "请先登录！";
-                            returnCode = "0002";
                         }
                         return JsonConvert.SerializeObject(new ResponseCommon(returnCode, returnMsg, null, new commParameter(rreq.loginUserId, rreq.transId)));
                     }
@@ -213,47 +223,50 @@ namespace fns.API
                         List<int> collections = new List<int>();
                         var uId = 0;
                         Int32.TryParse(rreq.loginUserId, out uId);
-                        var user = await db.User.SingleOrDefaultAsync(u => u.Id == uId);
-                        if (user != null)
-                        {
-                            collections = !string.IsNullOrEmpty(user.Collections) ? JsonConvert.DeserializeObject<List<int>>(user.Collections) : new List<int>();
-                        }
-
-                        DateTime dt = DateTime.Now;
                         List<News> list = new List<News>();
                         List<newsResponse> newsList = new List<newsResponse>();
-                        News news = await db.News.SingleOrDefaultAsync(o => o.Id == (rreq.id ?? 0));
-                        if (news != null)
+                        using (fnsContext db = new fnsContext())
                         {
-                            dt = news.InsDt ?? DateTime.Now;
-                        }
-                        //上拉获取历史数据
-                        if (rreq.op == 0)
-                        {
-                            list = await db.News.Where(n => collections.Contains(n.Id) && n.InsDt < dt).OrderByDescending(o => o.InsDt).Take(rreq.ps).ToListAsync();
-                        }
-                        //下拉获取最新数据
-                        else
-                        {
-                            list = await db.News.Where(n => collections.Contains(n.Id)  && n.InsDt > dt).OrderBy(o => o.InsDt).Take(rreq.ps).OrderByDescending(o => o.InsDt).ToListAsync();
-                        }
-                        var categories = db.Category.ToList();
-                        var comments = db.Comment.Where(c => c.Status != (int)CommentStatusEnum.Illegal).ToList();
-                        list.ForEach(l =>
-                        {
-                            var vNews = l.ToViewModel(settings.Value.ServerPath);
-                            #region 获取category name
-                            if (string.IsNullOrEmpty(vNews.cName))
+                            var user = await db.User.SingleOrDefaultAsync(u => u.Id == uId);
+                            if (user != null)
                             {
-                                vNews.cName = categories.SingleOrDefault(o => o.Id == vNews.cid)?.Name;
+                                collections = !string.IsNullOrEmpty(user.Collections) ? JsonConvert.DeserializeObject<List<int>>(user.Collections) : new List<int>();
                             }
-                            #endregion
-                            #region 获取正常评论
-                            vNews.comments = new List<CommentResponse>();
-                            vNews.comments.AddRange(comments.Where(c => c.NId == vNews.id).Select(o => o.ToViewModel()).ToList());
-                            #endregion
-                            newsList.Add(vNews);
-                        });
+
+                            DateTime dt = DateTime.Now;
+                            News news = await db.News.SingleOrDefaultAsync(o => o.Id == (rreq.id ?? 0));
+                            if (news != null)
+                            {
+                                dt = news.InsDt ?? DateTime.Now;
+                            }
+                            //上拉获取历史数据
+                            if (rreq.op == 0)
+                            {
+                                list = await db.News.Where(n => collections.Contains(n.Id) && n.InsDt < dt).OrderByDescending(o => o.InsDt).Take(rreq.ps).ToListAsync();
+                            }
+                            //下拉获取最新数据
+                            else
+                            {
+                                list = await db.News.Where(n => collections.Contains(n.Id) && n.InsDt > dt).OrderBy(o => o.InsDt).Take(rreq.ps).OrderByDescending(o => o.InsDt).ToListAsync();
+                            }
+                            var categories = db.Category.ToList();
+                            //var comments = db.Comment.Where(c => c.Status != (int)CommentStatusEnum.Illegal).ToList();
+                            list.ForEach(l =>
+                            {
+                                var vNews = l.ToViewModel(settings.Value.ServerPath);
+                                #region 获取category name
+                                if (string.IsNullOrEmpty(vNews.cName))
+                                {
+                                    vNews.cName = categories.SingleOrDefault(o => o.Id == vNews.cid)?.Name;
+                                }
+                                #endregion
+                                //#region 获取正常评论
+                                //vNews.comments = new List<CommentResponse>();
+                                //vNews.comments.AddRange(comments.Where(c => c.NId == vNews.id).Select(o => o.ToViewModel()).ToList());
+                                //#endregion
+                                newsList.Add(vNews);
+                            });
+                        }
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { newsList = newsList })), new commParameter(rreq.loginUserId, rreq.transId)));
                     }
                 }
@@ -278,27 +291,30 @@ namespace fns.API
                         getHistoryRequest rreq = JsonConvert.DeserializeObject<getHistoryRequest>(reqStr);
                         
                         List<newsResponse> newsList = new List<newsResponse>();
-                        var news = db.News.Where(n => rreq.nIds.Contains(n.Id));
-                        var categories = db.Category.ToList();
-                        var comments = db.Comment.Where(c => c.Status != (int)CommentStatusEnum.Illegal).ToList();
-                        rreq.nIds.ForEach(id=>{
-                            var thisNews = news.SingleOrDefault(n => n.Id == id);
-                            if (thisNews != null)
-                            {
-                                var vNews = thisNews.ToViewModel(settings.Value.ServerPath);
-                                #region 获取category name
-                                if (string.IsNullOrEmpty(vNews.cName))
+                        using (fnsContext db= new fnsContext())
+                        {
+                            var news = db.News.Where(n => rreq.nIds.Contains(n.Id));
+                            var categories = db.Category.ToList();
+                            //var comments = db.Comment.Where(c => c.Status != (int)CommentStatusEnum.Illegal).ToList();
+                            rreq.nIds.ForEach(id => {
+                                var thisNews = news.SingleOrDefault(n => n.Id == id);
+                                if (thisNews != null)
                                 {
-                                    vNews.cName = categories.SingleOrDefault(o => o.Id == vNews.cid)?.Name;
+                                    var vNews = thisNews.ToViewModel(settings.Value.ServerPath);
+                                    #region 获取category name
+                                    if (string.IsNullOrEmpty(vNews.cName))
+                                    {
+                                        vNews.cName = categories.SingleOrDefault(o => o.Id == vNews.cid)?.Name;
+                                    }
+                                    #endregion
+                                    //#region 获取正常评论
+                                    //vNews.comments = new List<CommentResponse>();
+                                    //vNews.comments.AddRange(comments.Where(c => c.NId == vNews.id).Select(o => o.ToViewModel()).ToList());
+                                    //#endregion
+                                    newsList.Add(vNews);
                                 }
-                                #endregion
-                                #region 获取正常评论
-                                vNews.comments = new List<CommentResponse>();
-                                vNews.comments.AddRange(comments.Where(c => c.NId == vNews.id).Select(o => o.ToViewModel()).ToList());
-                                #endregion
-                                newsList.Add(vNews);
-                            }
-                        });
+                            });
+                        }
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { newsList })), new commParameter(rreq.loginUserId, rreq.transId)));
                     }
                 }
@@ -323,48 +339,110 @@ namespace fns.API
                     {
                         commentRequest rreq = JsonConvert.DeserializeObject<commentRequest>(reqStr);
                         var uId = 0;
-                        Int32.TryParse(rreq.loginUserId, out uId);
-                        var user = await db.User.SingleOrDefaultAsync(u => u.Id == uId);
-                        var news = await db.News.SingleOrDefaultAsync(n => n.Id == rreq.nId);
                         var returnMsg = "";
                         var returnCode = "0000";
-                        if (user != null)
+                        Int32.TryParse(rreq.loginUserId, out uId);
+                        using (fnsContext db = new fnsContext())
                         {
-                            if (news != null)
+                            var user = await db.User.SingleOrDefaultAsync(u => u.Id == uId);
+                            var news = await db.News.SingleOrDefaultAsync(n => n.Id == rreq.nId);
+                            if (user != null)
                             {
-                                if (!string.IsNullOrEmpty(rreq.comment))
+                                if (news != null)
                                 {
-                                    Comment comment = new Comment() {
-                                        UId = user.Id,
-                                        NId = news.Id,
-                                        Content = rreq.comment,
-                                        Status = (int)CommentStatusEnum.Normal,
-                                        InsDt =DateTime.Now
-                                    };
-                                    db.Comment.Add(comment);
-                                    news.CommentCount = (news.CommentCount ?? 0)  + 1;
-                                    db.News.Update(news);
-                                    await db.SaveChangesAsync();
-                                    returnMsg = "评论成功！";
+                                    if (!string.IsNullOrEmpty(rreq.comment))
+                                    {
+                                        Comment comment = new Comment()
+                                        {
+                                            UId = user.Id,
+                                            NId = news.Id,
+                                            Content = rreq.comment,
+                                            Status = (int)CommentStatusEnum.Normal,
+                                            InsDt = DateTime.Now
+                                        };
+                                        db.Comment.Add(comment);
+                                        news.CommentCount = (news.CommentCount ?? 0) + 1;
+                                        db.News.Update(news);
+                                        await db.SaveChangesAsync();
+                                        returnMsg = "评论成功！";
+                                    }
+                                    else
+                                    {
+                                        returnMsg = "评论不能为空！";
+                                        returnCode = "0004";
+                                    }
                                 }
                                 else
                                 {
-                                    returnMsg = "评论不能为空！";
-                                    returnCode = "0004";
+
+                                    returnMsg = "找不到该新闻！";
+                                    returnCode = "0003";
                                 }
                             }
-                            else {
-
-                                returnMsg = "找不到该新闻！";
-                                returnCode = "0003";
+                            else
+                            {
+                                returnMsg = "请先登录！";
+                                returnCode = "0002";
                             }
                         }
-                        else
-                        {
-                            returnMsg = "请先登录！";
-                            returnCode = "0002";
-                        }
                         return JsonConvert.SerializeObject(new ResponseCommon(returnCode, returnMsg, null, new commParameter(rreq.loginUserId, rreq.transId)));
+                    }
+                }
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", ex.Message, null, new commParameter("", "")));
+            }
+        }
+        // GET api/values
+        [HttpPost("GetCommentList")]
+        public async Task<string> GetCommentList([FromBody] RequestCommon req)
+        {
+            try
+            {
+                if (req != null && req.d != null)
+                {
+                    var reqStr = DESUtil.DecryptCommonParam(req.d);
+                    if (!string.IsNullOrEmpty(reqStr))
+                    {
+                        commentPageRequest rreq = JsonConvert.DeserializeObject<commentPageRequest>(reqStr);
+                        DateTime dt = DateTime.Now;
+                        List<Comment> list = new List<Comment>();
+                        List<CommentResponse> commentList = new List<CommentResponse>();
+                        using (fnsContext db=new fnsContext())
+                        {
+                            Comment comment = await db.Comment.SingleOrDefaultAsync(o => o.Id == (rreq.id ?? 0));
+                            if (comment != null)
+                            {
+                                dt = comment.InsDt;
+                            }
+                            //上拉获取历史数据
+                            if (rreq.op == 0)
+                            {
+                                list = await db.Comment.Where(n => n.Status != (int)CommentStatusEnum.Illegal && n.NId == rreq.nid && n.InsDt < dt).OrderByDescending(o => o.InsDt).Take(rreq.ps).ToListAsync();
+                            }
+                            //下拉获取最新数据
+                            else
+                            {
+                                list = await db.Comment.Where(n => n.Status != (int)CommentStatusEnum.Illegal && n.NId == rreq.nid && n.InsDt > dt).OrderBy(o => o.InsDt).Take(rreq.ps).OrderByDescending(o => o.InsDt).ToListAsync();
+                            }
+                            var uIds = list.Select(l => l.UId).Distinct().ToList();
+                            var users = db.User.Where(u => uIds.Contains(u.Id)).ToList();
+                            list.ForEach(l =>
+                            {
+                                var vComment = l.ToViewModel();
+                                vComment.user = l.U != null ? l.U.ToViewModel(settings.Value.ServerPath) : null;
+                                if (vComment.user == null)
+                                {
+                                    var curU = users.SingleOrDefault(u => u.Id == vComment.uId);
+                                    if (curU != null)
+                                        vComment.user = curU.ToViewModel(settings.Value.ServerPath);
+                                }
+                                commentList.Add(vComment);
+                            });
+                        }
+                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { commentList = commentList })), new commParameter(rreq.loginUserId, rreq.transId)));
                     }
                 }
                 return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));

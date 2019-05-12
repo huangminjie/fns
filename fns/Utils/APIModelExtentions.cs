@@ -12,7 +12,7 @@ namespace fns.Utils.API
 {
     public static class APIModelExtentions
     {
-        private static fnsContext db = new fnsContext();
+        //private static fnsContext db = new fnsContext();
         public static userResponse ToViewModel(this User model, string serverPath)
         {
             userResponse vModel = new userResponse();
@@ -20,7 +20,7 @@ namespace fns.Utils.API
             vModel.name = model.Name;
             vModel.birthday = model.Birthday.ToDate();
             vModel.gender = model.Gender ?? (int)UserGenderEnum.Unknown;
-            vModel.avatar = serverPath + model.Avatar;
+            vModel.avatar = string.IsNullOrEmpty(model.Avatar)? serverPath + "/img/avatar.jpg": serverPath + model.Avatar;
             vModel.status = model.Status;
             vModel.cids = model.Categories;
             return vModel;
@@ -71,7 +71,7 @@ namespace fns.Utils.API
                 uId = model.UId,
                 content = model.Content,
                 status = model.Status,
-                insDT= model.InsDt.ToDate()
+                insDT = model.InsDt.ToDate()
             };
             return vModel;
         }

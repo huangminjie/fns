@@ -26,11 +26,12 @@ namespace fns.Models.API.Response.News
         public int status { get; set; }
         public string insDt { get; set; }
         public bool isCollection { get; set; }
-        public List<CommentResponse> comments { get; set; }
+        //public List<CommentResponse> comments { get; set; }
     }
     public class CommentResponse
     {
         public int id { get; set; }
+        public User.userResponse user { get; set; }
         public int nId { get; set; }
         public int uId { get; set; }
         public string content { get; set;}

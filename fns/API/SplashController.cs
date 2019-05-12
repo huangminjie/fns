@@ -38,16 +38,19 @@ namespace fns.API
                     {
                         RequestBase rreq = JsonConvert.DeserializeObject<RequestBase>(reqStr);
                         splashResponse splash = new splashResponse();
-                        var model = await db.Splash.FirstOrDefaultAsync();
-                        if (model != null)
+                        using (fnsContext db= new fnsContext())
                         {
-                            splash = new splashResponse()
+                            var model = await db.Splash.FirstOrDefaultAsync();
+                            if (model != null)
                             {
-                                id = model.Id,
-                                redirectUrl = model.RedirectUrl,
-                                picUrl = settings.Value.ServerPath + model.PicUrl,
-                                duration = model.Duration ?? 0
-                            };
+                                splash = new splashResponse()
+                                {
+                                    id = model.Id,
+                                    redirectUrl = model.RedirectUrl,
+                                    picUrl = settings.Value.ServerPath + model.PicUrl,
+                                    duration = model.Duration ?? 0
+                                };
+                            }
                         }
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { splash = splash })), new commParameter(rreq.loginUserId, rreq.transId)));
 

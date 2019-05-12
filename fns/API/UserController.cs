@@ -1,6 +1,7 @@
 ﻿using fns.Models.API;
 using fns.Models.API.Request;
 using fns.Models.API.Request.User;
+using fns.Models.DB;
 using fns.Models.Global;
 using fns.Utils;
 using fns.Utils.API;
@@ -30,8 +31,9 @@ namespace fns.API
         public string Get(int id)
         {
             #region MyRegion
-            //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "3", transId = "sdfsd", id = 29 }));
-            return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "3", transId = "sdfsd", ps = 15, op = 0, nids = new List<int>() { 29,39} }));
+            //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "3", transId = "sdfsd", id = 139 }));
+            //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "3", transId = "sdfsd", id=3, ps = 15, op = 1, nid = 39 }));
+            //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { loginUserId = "3", transId = "sdfsd", ps = 15, op = 0, nids = new List<int>() { 29,39} }));
             //return DESUtil.DecryptCommonParam("zL12nTPj7Ez2GJCL9v0LHqC2tuLHLO0v5x7IGHym1aTYIXWGI8HjhBLJ72OBqtUXgOt3DXjDbBcGu4TmnrqS0dsqNiYaNW5vR00ctHy9jO8qMUG/QMpqkeHbIYLvYHwSdsyN6/wOZJGwdKHzerSusOpbbTlwYsTVKQ5btye+A5K+xnkr0NXW9hM4PoWjp+h3S72AEa+21MNOXsL/pnTt/JvKMF2a3eHgJrPl93chjJ3Xnv2eWiHzXPdwPhouGYGFSXXEjhbm5+IFIZx2YnuIfiM+Xpd9OTfzcaebtXMAsU1ZacGiNfiOeDLDzYWlpoXRF6FTZRNOiVGRKmJXbAlsO1h7+7CUr8uwe6KTTaa3DRyG5a6CmD5dSh4pQJqszL3SxDIb+PbKL0houcyUVq7YNsYWIR/S1GfW9ZjX0OJl0zOVPIkgvjaP/rXH16ggX0DC42O7wMkE1f9hFXQugMwWUg==");
             //register
             //return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { name = "test0421", password = "123456", loginUserId = "1", transId = "sdfsd" }));
@@ -46,7 +48,7 @@ namespace fns.API
             {
                 loginUserId = id,
                 transId = "test",
-                id= 39
+                isAttentioned = true
             };
             return DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(req));
         }
@@ -65,32 +67,36 @@ namespace fns.API
                         registRequest rreq = JsonConvert.DeserializeObject<registRequest>(reqStr);
                         if (!string.IsNullOrEmpty(rreq.name) && !string.IsNullOrEmpty(rreq.password))
                         {
-                            if ((await db.User.FirstOrDefaultAsync(u => u.Name == rreq.name)) != null)
-                                return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名已存在！", null, new commParameter(rreq.loginUserId, rreq.transId)));
-
-                            var categories = new List<int>();
-                            await db.Category.ForEachAsync(c => {
-                                categories.Add(c.Id);
-                            });
-
-                            var user = new Models.DB.User()
+                            Models.DB.User user = new Models.DB.User();
+                            using (fnsContext db = new fnsContext())
                             {
-                                Name = rreq.name,
-                                Password = DES_MD5Util.Encrypt(rreq.password),
-                                InsDt = DateTime.Now,
-                                Gender = 0,//rreq.gender,
-                                //Avatar = rreq.avatar,
-                                Status = (int)UserStatusEnum.Normal,
-                                Categories = JsonConvert.SerializeObject(categories)
-                        };
+                                if ((await db.User.FirstOrDefaultAsync(u => u.Name == rreq.name)) != null)
+                                    return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名已存在！", null, new commParameter(rreq.loginUserId, rreq.transId)));
 
-                            //DateTime birthday = DateTime.MinValue;
-                            //var isDate = DateTime.TryParse(rreq.birthday, out birthday);
-                            //if (isDate && birthday != DateTime.MinValue)
-                            //    user.Birthday = birthday;
+                                var categories = new List<int>();
+                                await db.Category.ForEachAsync(c => {
+                                    categories.Add(c.Id);
+                                });
 
-                            await db.User.AddAsync(user);
-                            await db.SaveChangesAsync();
+                                user = new Models.DB.User()
+                                {
+                                    Name = rreq.name,
+                                    Password = DES_MD5Util.Encrypt(rreq.password),
+                                    InsDt = DateTime.Now,
+                                    Gender = 0,//rreq.gender,
+                                               //Avatar = rreq.avatar,
+                                    Status = (int)UserStatusEnum.Normal,
+                                    Categories = JsonConvert.SerializeObject(categories)
+                                };
+
+                                //DateTime birthday = DateTime.MinValue;
+                                //var isDate = DateTime.TryParse(rreq.birthday, out birthday);
+                                //if (isDate && birthday != DateTime.MinValue)
+                                //    user.Birthday = birthday;
+
+                                await db.User.AddAsync(user);
+                                await db.SaveChangesAsync();
+                            }
                             return JsonConvert.SerializeObject(new ResponseCommon("0000", "注册成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel(settings.Value.ServerPath) })), new commParameter(rreq.loginUserId, rreq.transId)));
                         }
                         return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名或密码不能为空！", null, new commParameter(rreq.loginUserId, rreq.transId)));
@@ -116,7 +122,11 @@ namespace fns.API
                     if (!string.IsNullOrEmpty(reqStr))
                     {
                         loginRequest lreq = JsonConvert.DeserializeObject<loginRequest>(reqStr);
-                        var user = await db.User.FirstOrDefaultAsync(u => u.Name == lreq.name);
+                        User user = new User();
+                        using (fnsContext db= new fnsContext())
+                        {
+                            user = await db.User.FirstOrDefaultAsync(u => u.Name == lreq.name);
+                        }
                         if (user != null)
                         {
                             if (user.Password == DES_MD5Util.Encrypt(lreq.password))
@@ -151,24 +161,27 @@ namespace fns.API
                         userRequest ureq = JsonConvert.DeserializeObject<userRequest>(reqStr);
                         if (ureq.id != 0)
                         {
-                            var user = await db.User.SingleOrDefaultAsync(u => u.Id == ureq.id);
-                            if (user == null)
-                                return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该用户！", null, new commParameter(ureq.loginUserId, ureq.transId)));
+                            using (fnsContext db= new fnsContext())
+                            {
+                                var user = await db.User.SingleOrDefaultAsync(u => u.Id == ureq.id);
+                                if (user == null)
+                                    return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该用户！", null, new commParameter(ureq.loginUserId, ureq.transId)));
 
-                            //if (db.User.Any(u => u.Name == ureq.name && u.Id != ureq.id))
-                            //    return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名已存在！", null, new commParameter(ureq.loginUserId, ureq.transId)));
+                                //if (db.User.Any(u => u.Name == ureq.name && u.Id != ureq.id))
+                                //    return JsonConvert.SerializeObject(new ResponseCommon("0002", "用户名已存在！", null, new commParameter(ureq.loginUserId, ureq.transId)));
 
-                            //user.Name = ureq.name;
-                            DateTime birthday = DateTime.MinValue;
-                            var isDate = DateTime.TryParse(ureq.birthday, out birthday);
-                            if (isDate && birthday != DateTime.MinValue)
-                                user.Birthday = birthday;
-                            user.Gender = ureq.gender;
-                            if(!string.IsNullOrEmpty(ureq.avatar))
-                                user.Avatar = ureq.avatar;
-                            db.User.Update(user);
-                            await db.SaveChangesAsync();
-                            return JsonConvert.SerializeObject(new ResponseCommon("0000", "修改成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel(settings.Value.ServerPath) })), new commParameter(ureq.loginUserId, ureq.transId)));
+                                //user.Name = ureq.name;
+                                DateTime birthday = DateTime.MinValue;
+                                var isDate = DateTime.TryParse(ureq.birthday, out birthday);
+                                if (isDate && birthday != DateTime.MinValue)
+                                    user.Birthday = birthday;
+                                user.Gender = ureq.gender;
+                                if (!string.IsNullOrEmpty(ureq.avatar))
+                                    user.Avatar = ureq.avatar;
+                                db.User.Update(user);
+                                await db.SaveChangesAsync();
+                                return JsonConvert.SerializeObject(new ResponseCommon("0000", "修改成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel(settings.Value.ServerPath) })), new commParameter(ureq.loginUserId, ureq.transId)));
+                            }
                         }
                         return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该用户！", null, new commParameter(ureq.loginUserId, ureq.transId)));
                     }
@@ -195,12 +208,15 @@ namespace fns.API
 
                         var uId = 0;
                         Int32.TryParse(rreq.loginUserId, out uId);
-                        var user = await db.User.SingleOrDefaultAsync(u => u.Id == uId);
-                        if (user != null)
+                        using (fnsContext db= new fnsContext())
                         {
-                            user.Categories = JsonConvert.SerializeObject(rreq.cIds);
-                            db.User.Update(user);
-                            await db.SaveChangesAsync();
+                            var user = await db.User.SingleOrDefaultAsync(u => u.Id == uId);
+                            if (user != null)
+                            {
+                                user.Categories = JsonConvert.SerializeObject(rreq.cIds);
+                                db.User.Update(user);
+                                await db.SaveChangesAsync();
+                            }
                         }
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", null, new commParameter(rreq.loginUserId, rreq.transId)));
                     }
@@ -227,15 +243,19 @@ namespace fns.API
                         passwordRequest rreq = JsonConvert.DeserializeObject<passwordRequest>(reqStr);
                         if (!string.IsNullOrEmpty(rreq.oldPassword) && !string.IsNullOrEmpty(rreq.newPassword))
                         {
-                            var user = await db.User.SingleOrDefaultAsync(u => u.Id == rreq.id);
-                            if (user == null)
-                                return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该用户！", null, new commParameter(rreq.loginUserId, rreq.transId)));
-                            if (DES_MD5Util.Encrypt(rreq.oldPassword) != user.Password)
-                                return JsonConvert.SerializeObject(new ResponseCommon("0002", "旧密码不正确！", null, new commParameter(rreq.loginUserId, rreq.transId)));
+                            User user = new User();
+                            using (fnsContext db = new fnsContext())
+                            {
+                                user = await db.User.SingleOrDefaultAsync(u => u.Id == rreq.id);
+                                if (user == null)
+                                    return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该用户！", null, new commParameter(rreq.loginUserId, rreq.transId)));
+                                if (DES_MD5Util.Encrypt(rreq.oldPassword) != user.Password)
+                                    return JsonConvert.SerializeObject(new ResponseCommon("0002", "旧密码不正确！", null, new commParameter(rreq.loginUserId, rreq.transId)));
 
-                            user.Password = DES_MD5Util.Encrypt(rreq.newPassword);
+                                user.Password = DES_MD5Util.Encrypt(rreq.newPassword);
 
-                            await db.SaveChangesAsync();
+                                await db.SaveChangesAsync();
+                            }
                             return JsonConvert.SerializeObject(new ResponseCommon("0000", "密码修改成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = user.ToViewModel(settings.Value.ServerPath) })), new commParameter(rreq.loginUserId, rreq.transId)));
                         }
                         return JsonConvert.SerializeObject(new ResponseCommon("0002", "密码不能为空！", null, new commParameter(rreq.loginUserId, rreq.transId)));

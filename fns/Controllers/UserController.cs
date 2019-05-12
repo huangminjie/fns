@@ -15,6 +15,7 @@ using fns.Models.Admin.VModels;
 using fns.Utils;
 using fns.Models.Admin.Request;
 using Newtonsoft.Json;
+using fns.Models.DB;
 
 namespace fns.Controllers
 {
@@ -35,20 +36,24 @@ namespace fns.Controllers
             try
             {
                 var list = new List<vUser>();
-                var total = db.User.Count();
-                await db.User.Skip((pager.pi - 1) * pager.ps).Take(pager.ps).ForEachAsync(o =>
+                var total = 0;
+                using (fnsContext db= new fnsContext())
                 {
-                    list.Add(new vUser()
+                    total = db.User.Count();
+                    await db.User.Skip((pager.pi - 1) * pager.ps).Take(pager.ps).ForEachAsync(o =>
                     {
-                        id = o.Id.ToString(),
-                        name = o.Name,
-                        avatar = o.Avatar,
-                        gender = o.Gender.HasValue ? ((UserGenderEnum)o.Gender.Value).ToEnumText() : "",
-                        status = ((UserStatusEnum)o.Status).ToEnumText(),
-                        insDt = o.InsDt.ToDate(),
-                        birthday = o.Birthday.ToDate()
+                        list.Add(new vUser()
+                        {
+                            id = o.Id.ToString(),
+                            name = o.Name,
+                            avatar = o.Avatar,
+                            gender = o.Gender.HasValue ? ((UserGenderEnum)o.Gender.Value).ToEnumText() : "",
+                            status = ((UserStatusEnum)o.Status).ToEnumText(),
+                            insDt = o.InsDt.ToDate(),
+                            birthday = o.Birthday.ToDate()
+                        });
                     });
-                });
+                }
                 return new Response(true, "", new GridPagination()
                 {
                     pi = pager.pi,
@@ -70,9 +75,13 @@ namespace fns.Controllers
             {
                 if (!string.IsNullOrEmpty(req.id))
                 {
-                    var user = await db.User.SingleOrDefaultAsync(o => o.Id == Convert.ToInt32(req.id));
-                    db.User.Remove(user);
-                    await db.SaveChangesAsync();
+                    using (fnsContext db= new fnsContext())
+                    {
+
+                        var user = await db.User.SingleOrDefaultAsync(o => o.Id == Convert.ToInt32(req.id));
+                        db.User.Remove(user);
+                        await db.SaveChangesAsync();
+                    }
                     return new Response(true);
                 }
                 else
@@ -92,16 +101,19 @@ namespace fns.Controllers
             try
             {
                 var cid = Convert.ToInt32(req.cid);
-                await db.User.ForEachAsync((item)=>{
-                    var cids = item.Categories != null ? JsonConvert.DeserializeObject<List<int>>(item.Categories) : new List<int>();
-                    if (!cids.Contains(cid))
-                    {
-                        cids.Add(cid);
-                        item.Categories = JsonConvert.SerializeObject(cids);
-                    }
-                    db.User.Update(item);
-                });
-                await db.SaveChangesAsync();
+                using (fnsContext db= new fnsContext())
+                {
+                    await db.User.ForEachAsync((item) => {
+                        var cids = item.Categories != null ? JsonConvert.DeserializeObject<List<int>>(item.Categories) : new List<int>();
+                        if (!cids.Contains(cid))
+                        {
+                            cids.Add(cid);
+                            item.Categories = JsonConvert.SerializeObject(cids);
+                        }
+                        db.User.Update(item);
+                    });
+                    await db.SaveChangesAsync();
+                }
                 return new Response(true);
             }
             catch (Exception ex)
@@ -116,14 +128,17 @@ namespace fns.Controllers
             try
             {
                 var list = new List<Models.Admin.VModels.vCategory>();
-                await db.Category.ForEachAsync(o =>
+                using (fnsContext db= new fnsContext())
                 {
-                    list.Add(new vCategory()
+                    await db.Category.ForEachAsync(o =>
                     {
-                        id = o.Id.ToString(),
-                        name = o.Name
+                        list.Add(new vCategory()
+                        {
+                            id = o.Id.ToString(),
+                            name = o.Name
+                        });
                     });
-                });
+                }
                 return new Response(true, "", list);
             }
             catch (Exception ex)

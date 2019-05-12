@@ -38,16 +38,19 @@ namespace fns.API
                     {
                         bannerRequest rreq = JsonConvert.DeserializeObject<bannerRequest>(reqStr);
                         List<bannerResponse> banners = new List<bannerResponse>();
-                        var bannerList = await db.Banner.Where(o => o.Cid == rreq.cid).ToListAsync();
-                        bannerList.ForEach(o => {
-                            banners.Add(new bannerResponse()
-                            {
-                                linkUrl = o.LinkUrl,
-                                picUrl = settings.Value.ServerPath + o.PicUrl,
-                                cid = o.Cid,
-                                type = o.Type ?? (int)BannerRedirectTypeEnum.In
+                        using (fnsContext db = new fnsContext())
+                        {
+                            var bannerList = await db.Banner.Where(o => o.Cid == rreq.cid).ToListAsync();
+                            bannerList.ForEach(o => {
+                                banners.Add(new bannerResponse()
+                                {
+                                    linkUrl = o.LinkUrl,
+                                    picUrl = settings.Value.ServerPath + o.PicUrl,
+                                    cid = o.Cid,
+                                    type = o.Type ?? (int)BannerRedirectTypeEnum.In
+                                });
                             });
-                        });
+                        }
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { banners = banners })), new commParameter(rreq.loginUserId, rreq.transId)));
 
                     }

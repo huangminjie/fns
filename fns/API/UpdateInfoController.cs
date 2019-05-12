@@ -17,9 +17,7 @@ namespace fns.API
 {
     [Route("api/[controller]")]
     public class UpdateInfoController : Controller
-    {
-        private fnsContext db = new fnsContext();
-        
+    {        
         [HttpPost("GetUpdateInfo")]
         public async Task<string> GetUpdateInfo([FromBody]RequestCommon req)
         {
@@ -32,14 +30,17 @@ namespace fns.API
                     {
                         RequestBase rreq = JsonConvert.DeserializeObject<RequestBase>(reqStr);
                         updateInfoResponse uir = new updateInfoResponse();
-                        var lastOne = await db.Updateinfo.OrderByDescending(o => o.InsDt ?? DateTime.MinValue).FirstOrDefaultAsync();
-                        if (lastOne != null)
+                        using (fnsContext db = new fnsContext())
                         {
-                            uir.id = lastOne.Id;
-                            uir.minVer = lastOne.MinVer;
-                            uir.newVer = lastOne.NewVer;
-                            uir.updateDesc = lastOne.UpdateDesc;
-                            uir.updateUrl = lastOne.UpdateUrl;
+                            var lastOne = await db.Updateinfo.OrderByDescending(o => o.InsDt ?? DateTime.MinValue).FirstOrDefaultAsync();
+                            if (lastOne != null)
+                            {
+                                uir.id = lastOne.Id;
+                                uir.minVer = lastOne.MinVer;
+                                uir.newVer = lastOne.NewVer;
+                                uir.updateDesc = lastOne.UpdateDesc;
+                                uir.updateUrl = lastOne.UpdateUrl;
+                            }
                         }
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { updateinfo = uir })), new commParameter(rreq.loginUserId, rreq.transId)));
 

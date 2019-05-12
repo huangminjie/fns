@@ -30,18 +30,22 @@ namespace fns.Controllers
             {
                 if (!string.IsNullOrEmpty(name) && !string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
                 {
-                    if (db.Admin.FirstOrDefault(u => u.Name == userName) != null)
-                        return JsonConvert.SerializeObject(new Response(false, "用户名已存在！", null));
-                    var admin = new Models.DB.Admin()
+                    Models.DB.Admin admin = new Models.DB.Admin();
+                    using (fnsContext db= new fnsContext())
                     {
-                        Name = name,
-                        Password = DES_MD5Util.Encrypt(password),
-                        InsDt = DateTime.Now,
-                        Status = (int)AdminStatusEnum.Normal
-                    };
-                    db.Admin.Add(admin);
-                    db.SaveChangesAsync();
-                    admin.Password = null;//返回数据前清空
+                        if (db.Admin.FirstOrDefault(u => u.Name == userName) != null)
+                            return JsonConvert.SerializeObject(new Response(false, "用户名已存在！", null));
+                        admin = new Models.DB.Admin()
+                        {
+                            Name = name,
+                            Password = DES_MD5Util.Encrypt(password),
+                            InsDt = DateTime.Now,
+                            Status = (int)AdminStatusEnum.Normal
+                        };
+                        db.Admin.Add(admin);
+                        db.SaveChangesAsync();
+                        admin.Password = null;//返回数据前清空
+                    }
                     return JsonConvert.SerializeObject(new Response(true, "注册成功！", admin));
                 }
                 return JsonConvert.SerializeObject(new Response(false, "用户名和密码不能为空！", null));
@@ -58,7 +62,11 @@ namespace fns.Controllers
             {
                 if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(password))
                 {
-                    var admin = db.Admin.FirstOrDefault(a => a.Name == userName);
+                    Admin admin = null;
+                    using (fnsContext db= new fnsContext())
+                    {
+                        admin = db.Admin.FirstOrDefault(a => a.Name == userName);
+                    }
                     //前端传来MD5加密过的密码， 后台把密码解密后MD5加密匹配
                     if (admin != null && DES_MD5Util.Md5Hash(DES_MD5Util.Decrypt(admin.Password)) == password)
                     {
@@ -84,34 +92,37 @@ namespace fns.Controllers
         [HttpPost]
         public async Task<string> Login(CurrentUser user, string returnUrl = null)
         {
-            if (user == null || string.IsNullOrEmpty(user.userName) || string.IsNullOrEmpty(user.password))
+            using (fnsContext db= new fnsContext())
             {
-                return JsonConvert.SerializeObject(new Response(false, "用户名和密码不能为空！", null));
+                if (user == null || string.IsNullOrEmpty(user.userName) || string.IsNullOrEmpty(user.password))
+                {
+                    return JsonConvert.SerializeObject(new Response(false, "用户名和密码不能为空！", null));
+                }
+                var lookupAdmin = db.Admin.FirstOrDefault(u => u.Name == user.userName);
+
+                //前端传来MD5加密过的密码， 后台把密码解密后MD5加密匹配
+                if (lookupAdmin == null || DES_MD5Util.Md5Hash(DES_MD5Util.Decrypt(lookupAdmin?.Password)) != user.password)
+                {
+                    return JsonConvert.SerializeObject(new Response(false, "用户名或密码错误！", null));
+                }
+
+                var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
+                identity.AddClaim(new Claim(ClaimTypes.Name, lookupAdmin.Name));
+
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+
+                if (returnUrl == null)
+                {
+                    returnUrl = TempData["returnUrl"]?.ToString();
+                }
+
+                if (returnUrl != null)
+                {
+                    return JsonConvert.SerializeObject(new Response(true, "登录成功！", returnUrl));
+                }
+
+                return JsonConvert.SerializeObject(new Response(true, "登录成功！", "/Home"));
             }
-            var lookupAdmin = db.Admin.FirstOrDefault(u => u.Name == user.userName);
-
-            //前端传来MD5加密过的密码， 后台把密码解密后MD5加密匹配
-            if (lookupAdmin == null || DES_MD5Util.Md5Hash(DES_MD5Util.Decrypt(lookupAdmin?.Password)) != user.password)
-            {
-                return JsonConvert.SerializeObject(new Response(false, "用户名或密码错误！", null));
-            }
-
-            var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
-            identity.AddClaim(new Claim(ClaimTypes.Name, lookupAdmin.Name));
-
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
-
-            if (returnUrl == null)
-            {
-                returnUrl = TempData["returnUrl"]?.ToString();
-            }
-
-            if (returnUrl != null)
-            {
-                return JsonConvert.SerializeObject(new Response(true, "登录成功！", returnUrl));
-            }
-
-            return JsonConvert.SerializeObject(new Response(true, "登录成功！", "/Home"));
         }
 
         public async Task<IActionResult> Logout()

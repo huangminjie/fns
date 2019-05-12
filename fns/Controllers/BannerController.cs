@@ -37,27 +37,30 @@ namespace fns.Controllers
             {
                 var categories = DropdownListUntil.CategoryDropDownList().ToList();
                 var list = new List<vBanner>();
-                await db.Banner.ForEachAsync(o =>
+                using (fnsContext db= new fnsContext())
                 {
-                    string categoryName = "";
-                    if (o.C != null)
-                        categoryName = o.C.Name;
-                    else
+                    await db.Banner.ForEachAsync(o =>
                     {
-                        var category = db.Category.SingleOrDefaultAsync(c => c.Id == o.Cid);
-                        if (category != null)
-                            categoryName = category.Result.Name;
-                    }
-                    list.Add(new vBanner()
-                    {
-                        id = o.Id.ToString(),
-                        picUrl = o.PicUrl,
-                        linkUrl = o.LinkUrl,
-                        type = o.Type.HasValue ? o.Type.Value.ToString() : "",
-                        cid = o.Cid.ToString(),
-                        cName = categoryName
+                        string categoryName = "";
+                        if (o.C != null)
+                            categoryName = o.C.Name;
+                        else
+                        {
+                            var category = db.Category.SingleOrDefaultAsync(c => c.Id == o.Cid);
+                            if (category != null)
+                                categoryName = category.Result.Name;
+                        }
+                        list.Add(new vBanner()
+                        {
+                            id = o.Id.ToString(),
+                            picUrl = o.PicUrl,
+                            linkUrl = o.LinkUrl,
+                            type = o.Type.HasValue ? o.Type.Value.ToString() : "",
+                            cid = o.Cid.ToString(),
+                            cName = categoryName
+                        });
                     });
-                });
+                }
                 return new Response(true, "", new { categories = categories, list = list });
             }
             catch (System.Exception ex)
@@ -70,25 +73,28 @@ namespace fns.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(req.id))
+                using (fnsContext db = new fnsContext())
                 {
-                    db.Banner.Add(new Banner()
+                    if (string.IsNullOrEmpty(req.id))
                     {
-                        PicUrl = req.picUrl,
-                        LinkUrl = req.linkUrl,
-                        Type = Convert.ToInt32(req.type),
-                        Cid = Convert.ToInt32(req.cid)
-                    });
+                        db.Banner.Add(new Banner()
+                        {
+                            PicUrl = req.picUrl,
+                            LinkUrl = req.linkUrl,
+                            Type = Convert.ToInt32(req.type),
+                            Cid = Convert.ToInt32(req.cid)
+                        });
+                    }
+                    else
+                    {
+                        var banner = await db.Banner.SingleOrDefaultAsync(o => o.Id == Convert.ToInt32(req.id));
+                        banner.PicUrl = req.picUrl;
+                        banner.LinkUrl = req.linkUrl;
+                        banner.Type = Convert.ToInt32(req.type);
+                        banner.Cid = Convert.ToInt32(req.cid);
+                    }
+                    await db.SaveChangesAsync();
                 }
-                else
-                {
-                    var banner = await db.Banner.SingleOrDefaultAsync(o => o.Id == Convert.ToInt32(req.id));
-                    banner.PicUrl = req.picUrl;
-                    banner.LinkUrl = req.linkUrl;
-                    banner.Type = Convert.ToInt32(req.type);
-                    banner.Cid = Convert.ToInt32(req.cid);
-                }
-                await db.SaveChangesAsync();
                 return new Response(true);
             }
             catch (Exception ex)
@@ -103,9 +109,12 @@ namespace fns.Controllers
             {
                 if (!string.IsNullOrEmpty(req.id))
                 {
-                    var banner = await db.Banner.SingleOrDefaultAsync(o => o.Id == Convert.ToInt32(req.id));
-                    db.Banner.Remove(banner);
-                    await db.SaveChangesAsync();
+                    using (fnsContext db= new fnsContext())
+                    {
+                        var banner = await db.Banner.SingleOrDefaultAsync(o => o.Id == Convert.ToInt32(req.id));
+                        db.Banner.Remove(banner);
+                        await db.SaveChangesAsync();
+                    }
                     return new Response(true);
                 }
                 else

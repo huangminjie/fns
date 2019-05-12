@@ -34,16 +34,19 @@ namespace fns.Controllers
             try
             {
                 var list = new List<Models.Admin.VModels.vSplash>();
-                await db.Splash.ForEachAsync(o =>
+                using (fnsContext db= new fnsContext())
                 {
-                    list.Add(new vSplash()
+                    await db.Splash.ForEachAsync(o =>
                     {
-                        id = o.Id.ToString(),
-                        picUrl = o.PicUrl,
-                        redirectUrl = o.RedirectUrl,
-                        duration = o.Duration.HasValue ? o.Duration.Value.ToString() : ""
+                        list.Add(new vSplash()
+                        {
+                            id = o.Id.ToString(),
+                            picUrl = o.PicUrl,
+                            redirectUrl = o.RedirectUrl,
+                            duration = o.Duration.HasValue ? o.Duration.Value.ToString() : ""
+                        });
                     });
-                });
+                }
                 return new Response(true, "", list);
             }
             catch (System.Exception ex)
@@ -56,23 +59,26 @@ namespace fns.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(req.id))
+                using (fnsContext db= new fnsContext())
                 {
-                    db.Splash.Add(new Splash()
+                    if (string.IsNullOrEmpty(req.id))
                     {
-                        PicUrl = req.picUrl,
-                        RedirectUrl = req.redirectUrl,
-                        Duration = Convert.ToInt32(req.duration)
-                    });
+                        db.Splash.Add(new Splash()
+                        {
+                            PicUrl = req.picUrl,
+                            RedirectUrl = req.redirectUrl,
+                            Duration = Convert.ToInt32(req.duration)
+                        });
+                    }
+                    else
+                    {
+                        var splash = await db.Splash.SingleOrDefaultAsync(o => o.Id == Convert.ToInt32(req.id));
+                        splash.PicUrl = req.picUrl;
+                        splash.RedirectUrl = req.redirectUrl;
+                        splash.Duration = Convert.ToInt32(req.duration);
+                    }
+                    await db.SaveChangesAsync();
                 }
-                else
-                {
-                    var splash = await db.Splash.SingleOrDefaultAsync(o => o.Id == Convert.ToInt32(req.id));
-                    splash.PicUrl = req.picUrl;
-                    splash.RedirectUrl = req.redirectUrl;
-                    splash.Duration = Convert.ToInt32(req.duration);
-                }
-                await db.SaveChangesAsync();
                 return new Response(true);
             }
             catch (Exception ex)
@@ -87,9 +93,12 @@ namespace fns.Controllers
             {
                 if (!string.IsNullOrEmpty(req.id))
                 {
-                    var splash = await db.Splash.SingleOrDefaultAsync(o => o.Id == Convert.ToInt32(req.id));
-                    db.Splash.Remove(splash);
-                    await db.SaveChangesAsync();
+                    using (fnsContext db = new fnsContext())
+                    {
+                        var splash = await db.Splash.SingleOrDefaultAsync(o => o.Id == Convert.ToInt32(req.id));
+                        db.Splash.Remove(splash);
+                        await db.SaveChangesAsync();
+                    }
                     return new Response(true);
                 }
                 else

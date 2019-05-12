@@ -19,9 +19,6 @@ namespace fns.API
     [Route("api/[controller]")]
     public class CategoryController : Controller
     {
-        private fnsContext db = new fnsContext();
-
-
         [HttpPost("GetCategories")]
         public async Task<string> GetCategories([FromBody]RequestCommon req)
         {
@@ -34,37 +31,47 @@ namespace fns.API
                     {
                         GetCategoryListRequest rreq = JsonConvert.DeserializeObject<GetCategoryListRequest>(reqStr);
                         List<categoryResponse> list = new List<categoryResponse>();
-                        var categories = await db.Category.ToListAsync();
-                        categories.ForEach(c => {
-                            list.Add(new categoryResponse()
-                            {
-                                id = c.Id,
-                                name = c.Name
-                            });
-                        });
-                        Int32.TryParse(rreq.loginUserId, out int uId);
-                        var user = db.User.SingleOrDefault(u => u.Id == uId);
-                        if (user != null)
+                        var res = new List<categoryResponse>();
+                        using (fnsContext db = new fnsContext())
                         {
-                            var user_categories = !string.IsNullOrEmpty(user.Categories) ? JsonConvert.DeserializeObject<List<int>>(user.Categories) : new List<int>();
-                            if (rreq.isAttentioned)
+                            var categories = await db.Category.ToListAsync();
+                            categories.ForEach(c => {
+                                list.Add(new categoryResponse()
+                                {
+                                    id = c.Id,
+                                    name = c.Name
+                                });
+                            });
+                            Int32.TryParse(rreq.loginUserId, out int uId);
+                            var user = db.User.SingleOrDefault(u => u.Id == uId);
+                            if (user != null)
                             {
-                                list = list.Where(o=> user_categories.Contains(o.id)).ToList();
+                                var user_categories = !string.IsNullOrEmpty(user.Categories) ? JsonConvert.DeserializeObject<List<int>>(user.Categories) : new List<int>();
+                                if (rreq.isAttentioned)
+                                {
+                                    foreach (var item in user_categories)
+                                    {
+                                        res.Add(list.SingleOrDefault(o => o.id == item));
+                                    }
+                                }
+                                else
+                                {
+                                    res = list.Where(o => !user_categories.Contains(o.id)).ToList();
+                                }
                             }
                             else
                             {
-                                list = list.Where(o => !user_categories.Contains(o.id)).ToList();
+                                if (!rreq.isAttentioned)
+                                {
+                                    res = new List<categoryResponse>();
+                                }
+                                else
+                                {
+                                    res = list;
+                                }
                             }
                         }
-                        else
-                        {
-                            if (!rreq.isAttentioned)
-                            { 
-                                list = new List<categoryResponse>();
-                            }
-                        }
-                        
-                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { categories = list })), new commParameter(rreq.loginUserId, rreq.transId)));
+                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { categories = res })), new commParameter(rreq.loginUserId, rreq.transId)));
 
                     }
                 }
