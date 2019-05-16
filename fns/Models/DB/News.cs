@@ -8,6 +8,7 @@ namespace fns.Models.DB
         public News()
         {
             Comment = new HashSet<Comment>();
+            Post = new HashSet<Post>();
         }
 
         public int Id { get; set; }
@@ -28,5 +29,6 @@ namespace fns.Models.DB
 
         public virtual Category C { get; set; }
         public virtual ICollection<Comment> Comment { get; set; }
+        public virtual ICollection<Post> Post { get; set; }
     }
 }

@@ -21,6 +21,9 @@ namespace fns.Models.DB
         public virtual DbSet<Category> Category { get; set; }
         public virtual DbSet<Comment> Comment { get; set; }
         public virtual DbSet<News> News { get; set; }
+        public virtual DbSet<Post> Post { get; set; }
+        public virtual DbSet<Postcomment> Postcomment { get; set; }
+        public virtual DbSet<Postcommentreply> Postcommentreply { get; set; }
         public virtual DbSet<Splash> Splash { get; set; }
         public virtual DbSet<Updateinfo> Updateinfo { get; set; }
         public virtual DbSet<User> User { get; set; }
@@ -248,6 +251,177 @@ namespace fns.Models.DB
                     .HasForeignKey(d => d.Cid)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_NewsToCategory");
+            });
+
+            modelBuilder.Entity<Post>(entity =>
+            {
+                entity.ToTable("post", "fns");
+
+                entity.HasIndex(e => e.Id)
+                    .HasName("PK_Post")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.Nid)
+                    .HasName("FK_PostToNews");
+
+                entity.HasIndex(e => e.Uid)
+                    .HasName("FK_PostToUser");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.CommentCount)
+                    .HasColumnName("commentCount")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.Content)
+                    .HasColumnName("content")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.InsDt).HasColumnName("insDT");
+
+                entity.Property(e => e.Nid)
+                    .HasColumnName("nid")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.PicUrlList)
+                    .HasColumnName("picUrlList")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Status)
+                    .HasColumnName("status")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.Uid)
+                    .HasColumnName("uid")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.UpCount)
+                    .HasColumnName("upCount")
+                    .HasColumnType("int(11)");
+
+                entity.Property(e => e.ViewCount)
+                    .HasColumnName("viewCount")
+                    .HasColumnType("int(11)");
+
+                entity.HasOne(d => d.N)
+                    .WithMany(p => p.Post)
+                    .HasForeignKey(d => d.Nid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_PostToNews");
+
+                entity.HasOne(d => d.U)
+                    .WithMany(p => p.Post)
+                    .HasForeignKey(d => d.Uid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_PostToUser");
+            });
+
+            modelBuilder.Entity<Postcomment>(entity =>
+            {
+                entity.ToTable("postcomment", "fns");
+
+                entity.HasIndex(e => e.Id)
+                    .HasName("PK_PostComment")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.Pid)
+                    .HasName("FK_PostCommentToPost");
+
+                entity.HasIndex(e => e.Uid)
+                    .HasName("FK_PostCommentToUser");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasColumnType("int(10)");
+
+                entity.Property(e => e.Content)
+                    .HasColumnName("content")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.InsDt).HasColumnName("insDT");
+
+                entity.Property(e => e.Pid)
+                    .HasColumnName("pid")
+                    .HasColumnType("int(10)");
+
+                entity.Property(e => e.ReplyCount)
+                    .HasColumnName("replyCount")
+                    .HasColumnType("int(10)");
+
+                entity.Property(e => e.Status)
+                    .HasColumnName("status")
+                    .HasColumnType("int(10)");
+
+                entity.Property(e => e.Uid)
+                    .HasColumnName("uid")
+                    .HasColumnType("int(10)");
+
+                entity.HasOne(d => d.P)
+                    .WithMany(p => p.Postcomment)
+                    .HasForeignKey(d => d.Pid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_PostCommentToPost");
+
+                entity.HasOne(d => d.U)
+                    .WithMany(p => p.Postcomment)
+                    .HasForeignKey(d => d.Uid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_PostCommentToUser");
+            });
+
+            modelBuilder.Entity<Postcommentreply>(entity =>
+            {
+                entity.ToTable("postcommentreply", "fns");
+
+                entity.HasIndex(e => e.Id)
+                    .HasName("PK_PostCommentReply")
+                    .IsUnique();
+
+                entity.HasIndex(e => e.Pcid)
+                    .HasName("FK_PostCommentReplyToPostComment");
+
+                entity.HasIndex(e => e.Uid)
+                    .HasName("FK_PostCommentReplyToUser");
+
+                entity.Property(e => e.Id)
+                    .HasColumnName("id")
+                    .HasColumnType("int(10)");
+
+                entity.Property(e => e.Content)
+                    .HasColumnName("content")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.InsDt).HasColumnName("insDT");
+
+                entity.Property(e => e.Pcid)
+                    .HasColumnName("pcid")
+                    .HasColumnType("int(10)");
+
+                entity.Property(e => e.Status)
+                    .HasColumnName("status")
+                    .HasColumnType("int(10)");
+
+                entity.Property(e => e.Uid)
+                    .HasColumnName("uid")
+                    .HasColumnType("int(10)");
+
+                entity.Property(e => e.UpCount)
+                    .HasColumnName("upCount")
+                    .HasColumnType("int(10)");
+
+                entity.HasOne(d => d.Pc)
+                    .WithMany(p => p.Postcommentreply)
+                    .HasForeignKey(d => d.Pcid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_PostCommentReplyToPostComment");
+
+                entity.HasOne(d => d.U)
+                    .WithMany(p => p.Postcommentreply)
+                    .HasForeignKey(d => d.Uid)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_PostCommentReplyToUser");
             });
 
             modelBuilder.Entity<Splash>(entity =>

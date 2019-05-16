@@ -8,6 +8,9 @@ namespace fns.Models.DB
         public User()
         {
             Comment = new HashSet<Comment>();
+            Post = new HashSet<Post>();
+            Postcomment = new HashSet<Postcomment>();
+            Postcommentreply = new HashSet<Postcommentreply>();
         }
 
         public int Id { get; set; }
@@ -22,5 +25,8 @@ namespace fns.Models.DB
         public string Categories { get; set; }
 
         public virtual ICollection<Comment> Comment { get; set; }
+        public virtual ICollection<Post> Post { get; set; }
+        public virtual ICollection<Postcomment> Postcomment { get; set; }
+        public virtual ICollection<Postcommentreply> Postcommentreply { get; set; }
     }
 }
