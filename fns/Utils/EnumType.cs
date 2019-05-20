@@ -48,4 +48,24 @@ namespace fns.Utils
         Normal = 0, //正常
         Illegal = 1, //违规
     }
+
+
+    public enum PostStatusEnum
+    {
+        Normal = 0, //正常
+        Deleted = 1, //被自己删除
+        DeletedByAdmin = 2//被管理员删除
+    }
+    public enum PostCommentStatusEnum
+    {
+        Normal = 0, //正常
+        Deleted = 1, //被自己删除
+        DeletedByAdmin = 2//被管理员删除
+    }
+    public enum PostCommentReplyStatusEnum
+    {
+        Normal = 0, //正常
+        Deleted = 1, //被自己删除
+        DeletedByAdmin = 2//被管理员删除
+    }
 }
