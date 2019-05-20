@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using fns.Models.API.Response.Post;
 
 namespace fns.Utils.API
 {
@@ -73,6 +74,30 @@ namespace fns.Utils.API
                 status = model.Status,
                 insDT = model.InsDt.ToDate()
             };
+            return vModel;
+        }
+
+
+        public static postResponse ToViewModel(this Post model, string serverPath)
+        {
+            postResponse vModel = new postResponse();
+            vModel.id = model.Id;
+            vModel.content = model.Content;
+            vModel.commentCount = model.CommentCount ?? 0;
+            vModel.upCount = model.UpCount ?? 0;
+            vModel.viewCount = model.ViewCount ?? 0;
+            vModel.status = model.Status ?? (int)PostStatusEnum.Normal;
+
+            vModel.picUrlList = new List<string>();
+            if (!string.IsNullOrEmpty(model.PicUrlList))
+            {
+                List<string> piclist = model.PicUrlList.Split(",").ToList();
+                piclist.ForEach(url =>
+                {
+                    vModel.picUrlList.Add(serverPath + url);//加上服务器地址
+                });
+            }
+            vModel.insDt = model.InsDt.ToDate();
             return vModel;
         }
     }

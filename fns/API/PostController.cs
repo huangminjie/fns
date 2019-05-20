@@ -9,6 +9,7 @@ using fns.Models.API.Response.Post;
 using fns.Models.DB;
 using fns.Models.Global;
 using fns.Utils;
+using fns.Utils.API;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -37,15 +38,139 @@ namespace fns.API
                     var reqStr = DESUtil.DecryptCommonParam(req.d);
                     if (!string.IsNullOrEmpty(reqStr))
                     {
-                        postFilterRequest rreq = JsonConvert.DeserializeObject<postFilterRequest>(reqStr);
+                        postFilterRequest preq = JsonConvert.DeserializeObject<postFilterRequest>(reqStr);
                         DateTime dt = DateTime.Now;
-                        List<News> list = new List<News>();
+                        List<Post> list = new List<Post>();
                         List<postResponse> postList = new List<postResponse>();
+                        var uId = 0;
+                        Int32.TryParse(preq.loginUserId, out uId);
                         using (fnsContext db = new fnsContext())
                         {
-                            
+                            if (preq.isMine)
+                            {
+                                var user = await db.User.SingleOrDefaultAsync(u => u.Id == uId);
+                                if (user == null)
+                                {
+                                    return JsonConvert.SerializeObject(new ResponseCommon("0002", "请先登录！", null, new commParameter(preq.loginUserId, preq.transId)));
+                                }
+                            }
+                            Post post = await db.Post.SingleOrDefaultAsync(o => o.Id == (preq.id ?? 0));
+                            if (post != null)
+                            {
+                                dt = post.InsDt;
+                            }
+                            //上拉获取历史数据
+                            if (preq.op == 0)
+                            {
+                                list = await db.Post.Where(p => p.Status == (int)PostStatusEnum.Normal && (preq.isMine ? p.Uid == uId : true) && p.InsDt < dt).OrderByDescending(o => o.InsDt).Take(preq.ps).ToListAsync();
+                            }
+                            //下拉获取最新数据
+                            else
+                            {
+                                list = await db.Post.Where(p => p.Status == (int)PostStatusEnum.Normal && (preq.isMine ? p.Uid == uId : true) && p.InsDt > dt).OrderBy(o => o.InsDt).Take(preq.ps).OrderByDescending(o => o.InsDt).ToListAsync();
+                            }
+
+                            postList = list.Select(p => p.ToViewModel(settings.Value.ServerPath)).ToList();
                         }
-                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { postList })), new commParameter(rreq.loginUserId, rreq.transId)));
+                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { postList })), new commParameter(preq.loginUserId, preq.transId)));
+                    }
+                }
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", ex.Message, null, new commParameter("", "")));
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<string> AddAsync([FromBody]RequestCommon req)
+        {
+            try
+            {
+                if (req != null && req.d != null)
+                {
+                    var reqStr = DESUtil.DecryptCommonParam(req.d);
+                    if (!string.IsNullOrEmpty(reqStr))
+                    {
+                        addRequest preq = JsonConvert.DeserializeObject<addRequest>(reqStr);
+                        if (!string.IsNullOrEmpty(preq.content))
+                        {
+                            Models.DB.User user = null;
+                            Models.DB.Post post= new Post();
+                            using (fnsContext db = new fnsContext())
+                            {
+                                var userId = 0;
+                                var isLogin = true;
+                                if (Int32.TryParse(preq.loginUserId, out userId))
+                                {
+                                    user = db.User.SingleOrDefault(u => u.Id == userId);
+                                }
+                                else
+                                    isLogin = false;
+                                if (isLogin && user != null)
+                                {
+                                    return JsonConvert.SerializeObject(new ResponseCommon("0003", "请先登录！", null, new commParameter(preq.loginUserId, preq.transId)));
+                                }
+
+                                post = new Post()
+                                {
+                                    Content = preq.content,
+                                    PicUrlList = preq.picUrlList,
+                                    Status = (int)PostStatusEnum.Normal,
+                                    InsDt = DateTime.Now
+                                };
+                                
+
+                                await db.Post.AddAsync(post);
+                                await db.SaveChangesAsync();
+                            }
+                            return JsonConvert.SerializeObject(new ResponseCommon("0000", "发帖成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = post.ToViewModel(settings.Value.ServerPath) })), new commParameter(preq.loginUserId, preq.transId)));
+                        }
+                        return JsonConvert.SerializeObject(new ResponseCommon("0002", "帖子内容不能为空！", null, new commParameter(preq.loginUserId, preq.transId)));
+                    }
+                }
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", ex.Message, null, new commParameter("", "")));
+            }
+        }
+
+        [HttpPost]
+        public async Task<string> DeleteAsync([FromBody]RequestCommon req)
+        {
+            try
+            {
+                if (req != null && req.d != null)
+                {
+                    var reqStr = DESUtil.DecryptCommonParam(req.d);
+                    if (!string.IsNullOrEmpty(reqStr))
+                    {
+                        deleteRequest preq = JsonConvert.DeserializeObject<deleteRequest>(reqStr);
+
+                        var uId = 0;
+                        Int32.TryParse(preq.loginUserId, out uId);
+                        using (fnsContext db = new fnsContext())
+                        {
+                            var user = await db.User.SingleOrDefaultAsync(u => u.Id == uId);
+                            if (user == null)
+                            {
+                                return JsonConvert.SerializeObject(new ResponseCommon("0002", "请先登录！", null, new commParameter(preq.loginUserId, preq.transId)));
+                            }
+                            var post = await db.Post.SingleOrDefaultAsync(p => p.Id == preq.id && p.Uid == uId);
+                            if (post == null)
+                            {
+                                return JsonConvert.SerializeObject(new ResponseCommon("0003", "找不到该帖子！", null, new commParameter(preq.loginUserId, preq.transId)));
+                            }
+                            post.Status = (int)PostStatusEnum.Deleted;
+                            db.Post.Update(post);
+                            await db.SaveChangesAsync();
+                        }
+                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "删除成功！", null, new commParameter(preq.loginUserId, preq.transId)));
+                        
                     }
                 }
                 return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));

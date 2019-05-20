@@ -261,9 +261,6 @@ namespace fns.Models.DB
                     .HasName("PK_Post")
                     .IsUnique();
 
-                entity.HasIndex(e => e.Nid)
-                    .HasName("FK_PostToNews");
-
                 entity.HasIndex(e => e.Uid)
                     .HasName("FK_PostToUser");
 
@@ -280,10 +277,6 @@ namespace fns.Models.DB
                     .IsUnicode(false);
 
                 entity.Property(e => e.InsDt).HasColumnName("insDT");
-
-                entity.Property(e => e.Nid)
-                    .HasColumnName("nid")
-                    .HasColumnType("int(11)");
 
                 entity.Property(e => e.PicUrlList)
                     .HasColumnName("picUrlList")
@@ -304,12 +297,6 @@ namespace fns.Models.DB
                 entity.Property(e => e.ViewCount)
                     .HasColumnName("viewCount")
                     .HasColumnType("int(11)");
-
-                entity.HasOne(d => d.N)
-                    .WithMany(p => p.Post)
-                    .HasForeignKey(d => d.Nid)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_PostToNews");
 
                 entity.HasOne(d => d.U)
                     .WithMany(p => p.Post)

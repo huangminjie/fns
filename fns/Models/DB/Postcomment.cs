@@ -16,7 +16,7 @@ namespace fns.Models.DB
         public string Content { get; set; }
         public int? ReplyCount { get; set; }
         public int? Status { get; set; }
-        public DateTime? InsDt { get; set; }
+        public DateTime InsDt { get; set; }
 
         public virtual Post P { get; set; }
         public virtual User U { get; set; }
