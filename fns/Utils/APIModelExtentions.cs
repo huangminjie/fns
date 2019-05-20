@@ -78,16 +78,16 @@ namespace fns.Utils.API
         }
 
 
-        public static postResponse ToViewModel(this Post model, string serverPath)
+        public static postResponse ToViewModel(this Post model, int loginUserId, string serverPath)
         {
             postResponse vModel = new postResponse();
             vModel.id = model.Id;
             vModel.content = model.Content;
-            vModel.commentCount = model.CommentCount ?? 0;
             vModel.upCount = model.UpCount ?? 0;
             vModel.viewCount = model.ViewCount ?? 0;
             vModel.status = model.Status ?? (int)PostStatusEnum.Normal;
-
+            var doUpList = string.IsNullOrEmpty(model.DoUpList) ? new List<int>() : JsonConvert.DeserializeObject<List<int>>(model.DoUpList);
+            vModel.doUp = loginUserId == 0 ? false : (doUpList.Contains(loginUserId));
             vModel.picUrlList = new List<string>();
             if (!string.IsNullOrEmpty(model.PicUrlList))
             {

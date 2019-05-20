@@ -16,5 +16,6 @@ namespace fns.Models.API.Response.Post
         public int commentCount { get; set; }
         public int status { get; set; }
         public string insDt { get; set; }
+        public bool doUp { get; set; }
     }
 }

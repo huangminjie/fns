@@ -28,6 +28,52 @@ namespace fns.API
 
         }
 
+
+        [HttpPost("GetById")]
+        public async Task<string> GetById([FromBody] RequestCommon req)
+        {
+            try
+            {
+                if (req != null && req.d != null)
+                {
+                    var reqStr = DESUtil.DecryptCommonParam(req.d);
+                    if (!string.IsNullOrEmpty(reqStr))
+                    {
+                        idRequest preq = JsonConvert.DeserializeObject<idRequest>(reqStr);
+                        postResponse vPost = new postResponse();
+                        var uId = 0;
+                        Int32.TryParse(preq.loginUserId, out uId);
+                        using (fnsContext db = new fnsContext())
+                        {
+                            var user = await db.User.SingleOrDefaultAsync(u => u.Id == uId);
+                            if (user == null)
+                            {
+                                uId = 0;
+                            }
+                            var post = await db.Post.SingleOrDefaultAsync(p => p.Id == preq.id);
+                            if (post == null)
+                            {
+                                return JsonConvert.SerializeObject(new ResponseCommon("0002", "找不到该帖子！", null, new commParameter(preq.loginUserId, preq.transId)));
+                            }
+                            post.ViewCount = (post.ViewCount ?? 0) + 1;
+                            
+                            db.Post.Update(post);
+                            await db.SaveChangesAsync();
+                            vPost = post.ToViewModel(uId, settings.Value.ServerPath);
+                            vPost.commentCount = db.Postcomment.Where(p => p.Pid == vPost.id).Count();
+                        }
+                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { post = vPost })), new commParameter(preq.loginUserId, preq.transId)));
+
+                    }
+                }
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", "请求无效, 参数异常！", null, new commParameter("", "")));
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(new ResponseCommon("0001", ex.Message, null, new commParameter("", "")));
+            }
+        }
+
         [HttpPost("GetList")]
         public async Task<string> GetList([FromBody] RequestCommon req)
         {
@@ -69,8 +115,13 @@ namespace fns.API
                             {
                                 list = await db.Post.Where(p => p.Status == (int)PostStatusEnum.Normal && (preq.isMine ? p.Uid == uId : true) && p.InsDt > dt).OrderBy(o => o.InsDt).Take(preq.ps).OrderByDescending(o => o.InsDt).ToListAsync();
                             }
-
-                            postList = list.Select(p => p.ToViewModel(settings.Value.ServerPath)).ToList();
+                            var pIds = list.Select(p=>p.Id).ToList();
+                            var pComments = db.Postcomment.Where(pc => pIds.Contains(pc.Pid));
+                            list.ForEach(p=> {
+                                var vPost = p.ToViewModel(uId, settings.Value.ServerPath);
+                                vPost.commentCount = pComments.Where(pc => pc.Pid == vPost.id).Count();
+                                postList.Add(vPost);
+                            });
                         }
                         return JsonConvert.SerializeObject(new ResponseCommon("0000", "成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { postList })), new commParameter(preq.loginUserId, preq.transId)));
                     }
@@ -99,9 +150,9 @@ namespace fns.API
                         {
                             Models.DB.User user = null;
                             Models.DB.Post post= new Post();
+                            var userId = 0;
                             using (fnsContext db = new fnsContext())
                             {
-                                var userId = 0;
                                 var isLogin = true;
                                 if (Int32.TryParse(preq.loginUserId, out userId))
                                 {
@@ -126,7 +177,7 @@ namespace fns.API
                                 await db.Post.AddAsync(post);
                                 await db.SaveChangesAsync();
                             }
-                            return JsonConvert.SerializeObject(new ResponseCommon("0000", "发帖成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = post.ToViewModel(settings.Value.ServerPath) })), new commParameter(preq.loginUserId, preq.transId)));
+                            return JsonConvert.SerializeObject(new ResponseCommon("0000", "发帖成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { user = post.ToViewModel(userId, settings.Value.ServerPath) })), new commParameter(preq.loginUserId, preq.transId)));
                         }
                         return JsonConvert.SerializeObject(new ResponseCommon("0002", "帖子内容不能为空！", null, new commParameter(preq.loginUserId, preq.transId)));
                     }
@@ -149,7 +200,7 @@ namespace fns.API
                     var reqStr = DESUtil.DecryptCommonParam(req.d);
                     if (!string.IsNullOrEmpty(reqStr))
                     {
-                        deleteRequest preq = JsonConvert.DeserializeObject<deleteRequest>(reqStr);
+                        idRequest preq = JsonConvert.DeserializeObject<idRequest>(reqStr);
 
                         var uId = 0;
                         Int32.TryParse(preq.loginUserId, out uId);

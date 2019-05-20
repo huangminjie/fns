@@ -268,12 +268,12 @@ namespace fns.Models.DB
                     .HasColumnName("id")
                     .HasColumnType("int(11)");
 
-                entity.Property(e => e.CommentCount)
-                    .HasColumnName("commentCount")
-                    .HasColumnType("int(11)");
-
                 entity.Property(e => e.Content)
                     .HasColumnName("content")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DoUpList)
+                    .HasColumnName("doUpList")
                     .IsUnicode(false);
 
                 entity.Property(e => e.InsDt).HasColumnName("insDT");
@@ -327,14 +327,14 @@ namespace fns.Models.DB
                     .HasColumnName("content")
                     .IsUnicode(false);
 
+                entity.Property(e => e.DoUpList)
+                    .HasColumnName("doUpList")
+                    .IsUnicode(false);
+
                 entity.Property(e => e.InsDt).HasColumnName("insDT");
 
                 entity.Property(e => e.Pid)
                     .HasColumnName("pid")
-                    .HasColumnType("int(10)");
-
-                entity.Property(e => e.ReplyCount)
-                    .HasColumnName("replyCount")
                     .HasColumnType("int(10)");
 
                 entity.Property(e => e.Status)
@@ -378,6 +378,10 @@ namespace fns.Models.DB
 
                 entity.Property(e => e.Content)
                     .HasColumnName("content")
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DoUpList)
+                    .HasColumnName("doUpList")
                     .IsUnicode(false);
 
                 entity.Property(e => e.InsDt).HasColumnName("insDT");

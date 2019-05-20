@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace fns.Models.API.Request.Post
 {
-    public class deleteRequest : RequestBase
+    public class idRequest : RequestBase
     {
         public int id { get; set; }
     }

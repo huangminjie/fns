@@ -16,9 +16,9 @@ namespace fns.Models.DB
         public string PicUrlList { get; set; }
         public int? UpCount { get; set; }
         public int? ViewCount { get; set; }
-        public int? CommentCount { get; set; }
         public int? Status { get; set; }
         public DateTime InsDt { get; set; }
+        public string DoUpList { get; set; }
 
         public virtual User U { get; set; }
         public virtual ICollection<Postcomment> Postcomment { get; set; }

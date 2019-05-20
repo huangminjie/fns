@@ -12,6 +12,7 @@ namespace fns.Models.DB
         public int? UpCount { get; set; }
         public int? Status { get; set; }
         public DateTime InsDt { get; set; }
+        public string DoUpList { get; set; }
 
         public virtual Postcomment Pc { get; set; }
         public virtual User U { get; set; }
