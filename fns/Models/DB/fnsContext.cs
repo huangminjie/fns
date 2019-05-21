@@ -345,6 +345,10 @@ namespace fns.Models.DB
                     .HasColumnName("uid")
                     .HasColumnType("int(10)");
 
+                entity.Property(e => e.UpCount)
+                    .HasColumnName("upCount")
+                    .HasColumnType("int(11)");
+
                 entity.HasOne(d => d.P)
                     .WithMany(p => p.Postcomment)
                     .HasForeignKey(d => d.Pid)

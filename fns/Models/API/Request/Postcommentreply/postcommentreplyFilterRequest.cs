@@ -11,5 +11,6 @@ namespace fns.Models.API.Request.Postcommentreply
         public int id { get; set; }
         public int op { get; set; }
         public int ps { get; set; }
+        public bool isMine { get; set; }
     }
 }

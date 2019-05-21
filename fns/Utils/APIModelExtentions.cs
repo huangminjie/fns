@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using fns.Models.API.Response.Post;
+using fns.Models.API.Response.Postcomment;
 
 namespace fns.Utils.API
 {
@@ -78,10 +79,11 @@ namespace fns.Utils.API
         }
 
 
-        public static postResponse ToViewModel(this Post model, int loginUserId, string serverPath)
+        public static postResponse ToViewModel(this Post model, int loginUserId, Models.DB.User user, string serverPath)
         {
             postResponse vModel = new postResponse();
             vModel.id = model.Id;
+            vModel.user = user == null ? null : user.ToViewModel(serverPath);
             vModel.content = model.Content;
             vModel.upCount = model.UpCount ?? 0;
             vModel.viewCount = model.ViewCount ?? 0;
@@ -100,5 +102,6 @@ namespace fns.Utils.API
             vModel.insDt = model.InsDt.ToDate();
             return vModel;
         }
+        
     }
 }

@@ -8,7 +8,7 @@ namespace fns.Models.API.Response.Post
     public class postResponse
     {
         public int id { get; set; }
-        public int uid { get; set; }
+        public Response.User.userResponse user { get; set; }
         public string content { get; set; }
         public List<string> picUrlList { get; set; }
         public int upCount { get; set; }
