@@ -227,13 +227,14 @@ namespace fns.API
                                 }
                                 else
                                     isLogin = false;
-                                if (isLogin && user != null)
+                                if (!isLogin || user == null)
                                 {
                                     return JsonConvert.SerializeObject(new ResponseCommon("0003", "请先登录！", null, new commParameter(preq.loginUserId, preq.transId)));
                                 }
 
                                 post = new Post()
                                 {
+                                    Uid = userId,
                                     Content = preq.content,
                                     PicUrlList = preq.picUrlList,
                                     Status = (int)PostStatusEnum.Normal,
