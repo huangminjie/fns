@@ -276,6 +276,7 @@ namespace fns.API
                     {
                         idRequest preq = JsonConvert.DeserializeObject<idRequest>(reqStr);
 
+                        postResponse vPost = new postResponse();
                         var uId = 0;
                         Int32.TryParse(preq.loginUserId, out uId);
                         using (fnsContext db = new fnsContext())
@@ -293,8 +294,12 @@ namespace fns.API
                             post.Status = (int)PostStatusEnum.Deleted;
                             db.Post.Update(post);
                             await db.SaveChangesAsync();
+
+                            var pUser = await db.User.SingleOrDefaultAsync(u => u.Id == post.Uid);
+                            //uId是当前用户，pUser是发帖人
+                            vPost = post.ToViewModel(uId, pUser, settings.Value.ServerPath);
                         }
-                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "删除成功！", null, new commParameter(preq.loginUserId, preq.transId)));
+                        return JsonConvert.SerializeObject(new ResponseCommon("0000", "删除成功！", DESUtil.EncryptCommonParam(JsonConvert.SerializeObject(new { post = vPost })), new commParameter(preq.loginUserId, preq.transId)));
                         
                     }
                 }

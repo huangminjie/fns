@@ -76,8 +76,7 @@ namespace fns.API
                 {
                     foreach (var firstFile in firstFiles)
                     {
-                        //var extension = Path.GetExtension(firstFile.FileName);
-                        var extension = DateTime.Now.ToString("yyyyMMddHHmmss");
+                        var extension = Path.GetExtension(firstFile.FileName);
                         var guid = Guid.NewGuid().ToString();
                         var fileName = guid + extension;
                         string folderName = $"{root}/upload/{type}";

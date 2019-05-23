@@ -93,7 +93,7 @@ namespace fns.Utils.API
             vModel.picUrlList = new List<string>();
             if (!string.IsNullOrEmpty(model.PicUrlList))
             {
-                List<string> piclist = model.PicUrlList.Split(",").ToList();
+                List<string> piclist = JsonConvert.DeserializeObject<List<string>>(model.PicUrlList);
                 piclist.ForEach(url =>
                 {
                     vModel.picUrlList.Add(serverPath + url);//加上服务器地址
