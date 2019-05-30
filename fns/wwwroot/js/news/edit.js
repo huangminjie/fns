@@ -10,8 +10,6 @@ editorNews.customConfig.uploadImgServer = serverUrl + '/picture/uploadpicture';
 editorNews.customConfig.uploadImgMaxSize = 5 * 1024 * 1024;
 // 限制一次最多上传 1 张图片
 editorNews.customConfig.uploadImgMaxLength = 5;
-// 隐藏“网络图片”tab
-editorNews.customConfig.showLinkImg = false;
 // 附加参数
 editorNews.customConfig.uploadImgParams = {
     type: 'news'
@@ -48,15 +46,15 @@ function returnNewsList() {
 
 function submitNews() {
 
-    if ($("#cid").val() == "") {
+    if ($("#cid").val() === "") {
         alert("类目不能为空！");
         return;
     }
-    if ($("#fld-title").val() == "") {
+    if ($("#fld-title").val() === "") {
         alert("标题不能为空！");
         return;
     }
-    if ($("#fld-auth").val() == "") {
+    if ($("#fld-auth").val() === "") {
         alert("作者不能为空！");
         return;
     }
@@ -68,23 +66,22 @@ function submitNews() {
 
     var content = editorNews.txt.html();
     if ($("#fld-context-0").is(":checked")) {
-        if (editorNews.txt.html().trim() == "<p><br></p>") {
+        if (editorNews.txt.html().trim() === "<p><br></p>") {
             alert("内容不能为空！");
             return;
         }
     } else {
-        if ($("#fld-doref").val().trim() == "") {
+        if ($("#fld-doref").val().trim() === "") {
             alert("新闻外链不能为空！");
             return;
         }
     }
-    if (content == "<p><br></p>") { content = "";}
+    if (content === "<p><br></p>") { content = "";}
 
-    //由于我们只允许本地上传图片至服务器，目前所有我们添加的图片格式为<img src="/upload/news/" style="max-width:100%;">
+    //本地上传的图片格式为<img src="/upload/news/" style="max-width:100%;">；外链的图片地址为正常的htttp地址
     $.each($('#divNewsContent #editor').find("img"), function (i, val) {
         var imgSrc = $(val).attr("src");
-        if (imgSrc.indexOf("/upload/news/") != -1)
-            picsList.push(imgSrc);
+        picsList.push(imgSrc);
     }); 
 
     $.ajax({
@@ -145,7 +142,7 @@ $(function () {
     });
 
     $("#fld-context-1").bind("click", function () {
-        if (editorNews.txt.html() != "<p><br></p>") {
+        if (editorNews.txt.html() !== "<p><br></p>") {
             if (confirm("您的操作将清空已添加的新闻内容，是否继续？")) {
                 $("#fld-context-0").removeProp("checked");
                 $("#fld-context-1").prop("checked", "checked");
@@ -175,7 +172,7 @@ $(function () {
         }
     });
     
-    if (isInnerNews == "True") {
+    if (isInnerNews === "True") {
         loadPreView();
         $("#fld-context-0").prop("checked", "checked");
         $("#fld-context-0").click();
@@ -186,11 +183,11 @@ $(function () {
     }
 
     //选择浏览器跳转方式
-    if (type == 1) {
+    if (type === 1) {
         $("#fld-type-0").prop("checked", "checked");
         $("#fld-type-0").click();
     }
-    else if (type == 2) {
+    else if (type === 2) {
         $("#fld-type-1").prop("checked", "checked");
         $("#fld-type-1").click();
     }

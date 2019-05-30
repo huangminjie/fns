@@ -78,7 +78,7 @@ namespace fns.API
                                 var categories = new List<int>();
                                 var cCount = await db.Category.CountAsync();
                                 var ps = cCount >= 4 ? 4 : cCount;
-                                await db.Category.Take(ps).ForEachAsync(c => {
+                                await db.Category.OrderBy(c => c.Id).Take(ps).ForEachAsync(c => {
                                     categories.Add(c.Id);
                                 });
 

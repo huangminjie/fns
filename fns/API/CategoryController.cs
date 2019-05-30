@@ -34,7 +34,7 @@ namespace fns.API
                         var res = new List<categoryResponse>();
                         using (fnsContext db = new fnsContext())
                         {
-                            var categories = await db.Category.ToListAsync();
+                            var categories = await db.Category.OrderBy(c=>c.Id).ToListAsync();
                             categories.ForEach(c => {
                                 list.Add(new categoryResponse()
                                 {
@@ -61,13 +61,18 @@ namespace fns.API
                             }
                             else
                             {
+                                int defaultPS = 4;
                                 if (!rreq.isAttentioned)
                                 {
                                     res = new List<categoryResponse>();
+                                    var total = list.Count;
+                                    if (total >= defaultPS) {
+                                        res = list.Skip(defaultPS).Take(total - defaultPS).ToList();
+                                    }
                                 }
                                 else
                                 {
-                                    res = list.Take(4).ToList();
+                                    res = list.Take(defaultPS).ToList();
                                 }
                             }
                         }
